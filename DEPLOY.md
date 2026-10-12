@@ -25,11 +25,11 @@ Limits of the free plans:
 Do step 2 right away: Aiven may switch off a new free database that nothing connects to in its first hours.
 
 ### 2. Website: Render
-1. Sign up at https://render.com with the GitHub account **manojbalu08**.
-2. **New → Blueprint** → choose `manojbalu08/Klenz`. Render reads `render.yaml` and asks for two values:
+1. Open **https://render.com/deploy?repo=https://github.com/manojbalu08/Klenz** and sign up / sign in with the GitHub account **manojbalu08**. (Or, in the Render dashboard: **New → Blueprint** → `manojbalu08/Klenz`.)
+2. Render reads `render.yaml` and shows one free service, **klenz**, in Singapore. It asks for two values:
    - `DATABASE_URL`: the Aiven Service URI
    - `ADMIN_PASSWORD`: a strong password for `/admin` (the login is `admin@klenz.com`)
-3. Click **Apply**. The first build takes 5–10 minutes. The address is at the top of the **klenz** service page, e.g. `https://klenz.onrender.com`. Open it and sign in at `/admin`.
+3. Click **Apply** (or **Deploy Blueprint**). The first build takes 5–10 minutes. The address is at the top of the **klenz** service page, e.g. `https://klenz.onrender.com`. Open it and sign in at `/admin`.
 
 ### 3. Connect GitHub Actions
 1. Render → **klenz** service → **Settings → Deploy Hook** → copy the URL.
