@@ -1,0 +1,119 @@
+# Tests every push and pull request. On main, when everything passes, deploys that exact
+# commit to Render and waits until it is live. One-time setup: DEPLOY.md.
+name: Test and deploy
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["**/*.md", "Images/**", "tools/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+      # As strict as Aiven: encrypted connections only, primary keys required, ANSI SQL mode.
+      - name: Start MySQL 8.4
+        run: >-
+          docker run -d --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=ci-password mysql:8.4
+          --require-secure-transport=ON --sql-require-primary-key=ON
+          --sql-mode=ANSI,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,STRICT_ALL_TABLES
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+      - run: pip install -r requirements-dev.txt
+      - name: Tests on SQLite
+        run: python -m pytest
+      - name: Wait for MySQL
+        run: |
+          for attempt in $(seq 1 60); do
+            docker exec mysql mysqladmin ping -h 127.0.0.1 -uroot -pci-password --silent && exit 0
+            sleep 2
+          done
+          docker logs mysql
+          exit 1
+      - name: Tests on MySQL, connecting with an Aiven-style link
+        env:
+          TEST_DATABASE_URL: mysql://root:ci-password@127.0.0.1:3306/klenz_test?ssl-mode=REQUIRED
+        run: python -m pytest
+
+  website:
+    name: Website lint and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+  image:
+    name: Docker image (what Render builds)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -t klenz .
+
+  deploy:
+    name: Deploy to Render
+    needs: [backend, website, image]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: true
+    environment:
+      name: production
+      url: ${{ vars.SITE_URL || 'https://dashboard.render.com' }}
+    steps:
+      - name: Start the deploy
+        id: start
+        env:
+          DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "::warning::Not deployed: add the RENDER_DEPLOY_HOOK_URL secret (DEPLOY.md, step 3)."
+            exit 0
+          fi
+          # ref= makes Render build exactly the commit that passed the tests.
+          curl -fsS -X POST "$DEPLOY_HOOK&ref=$GITHUB_SHA" > /dev/null
+          echo "started=true" >> "$GITHUB_OUTPUT"
+          echo "Render is building ${GITHUB_SHA::7}."
+      - name: Wait until it is live
+        if: steps.start.outputs.started == 'true' && vars.SITE_URL != ''
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          # A sleeping free service wakes up on the first request, which can take a minute.
+          for attempt in $(seq 1 60); do
+            live=$(curl -fsS --max-time 90 "${SITE_URL%/}/api/health" | jq -r '.commit // empty' || true)
+            if [ "$live" = "$GITHUB_SHA" ]; then
+              echo "Live: $SITE_URL" | tee -a "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 20
+          done
+          echo "::error::${GITHUB_SHA::7} was not live after 20 minutes. Open the deploy log on Render."
+          exit 1

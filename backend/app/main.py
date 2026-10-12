@@ -62,7 +62,7 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
 
     @app.get("/api/health", tags=["public"])
     def health() -> dict[str, str]:
-        return {"status": "ok", "database": engine.dialect.name}
+        return {"status": "ok", "database": engine.dialect.name, "commit": config.git_commit}
 
     _serve_frontend(app, config.frontend_dist)
     return app

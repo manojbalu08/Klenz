@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import Request
-from sqlalchemy import DateTime, Engine, create_engine, event, text
+from sqlalchemy import URL, DateTime, Engine, create_engine, event, text
 from sqlalchemy.engine import Dialect, make_url
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -39,8 +39,29 @@ def utcnow() -> datetime:
     return datetime.now(UTC).replace(microsecond=0)
 
 
-def create_db_engine(url: str) -> Engine:
+def parse_db_url(url: str) -> URL:
+    """Read DATABASE_URL, including the links hosting panels hand out.
+
+    Plain mysql:// (Railway, Aiven) means the PyMySQL driver here, and Aiven's
+    ?ssl-mode=REQUIRED (MySQL client syntax) becomes an encrypted PyMySQL connection.
+    """
+    url = url.strip()
+    if url.startswith("mysql://"):
+        url = "mysql+pymysql://" + url.removeprefix("mysql://")
     parsed = make_url(url)
+    mode = parsed.query.get("ssl-mode")
+    if mode is None:
+        return parsed
+    parsed = parsed.difference_update_query(["ssl-mode"])
+    if str(mode).upper() == "DISABLED":
+        return parsed
+    # An ssl setting without a CA file makes PyMySQL encrypt the connection without
+    # checking the server certificate, which is what REQUIRED means for MySQL clients.
+    return parsed.update_query_dict({"ssl_check_hostname": "false"})
+
+
+def create_db_engine(url: str) -> Engine:
+    parsed = parse_db_url(url)
     options: dict[str, Any] = {"pool_pre_ping": True}
     if parsed.get_backend_name() == "sqlite":
         options["connect_args"] = {"check_same_thread": False}
@@ -77,7 +98,7 @@ def ensure_mysql_database(url: str) -> bool:
 
     Returns True when a database was created. Does nothing for other backends.
     """
-    parsed = make_url(url)
+    parsed = parse_db_url(url)
     name = parsed.database
     if parsed.get_backend_name() != "mysql" or not name:
         return False

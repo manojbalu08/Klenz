@@ -7,7 +7,7 @@ Online shop + admin for **Klenz** tissue products (Pollachi, Tamil Nadu). Built 
 - `backend/` FastAPI + SQLAlchemy 2.1 (sync) + PyMySQL, Pydantic v2, PyJWT. Port :8000. In production it also serves `frontend/dist` (one port, SPA fallback).
 - Database: MySQL via `DATABASE_URL` in `backend/.env`. This PC: WAMP **MySQL 5.0.27**, user `root`, no password, database `klenz`, **`?charset=utf8`** (5.0 has no utf8mb4; use utf8mb4 on MySQL 5.5+/8). Tests use SQLite unless `TEST_DATABASE_URL` is set.
 - `Images/` the client's originals (logo, catalogue `products.jpeg`, product photos, visiting card). `tools/` scripts that turn them into web images and videos.
-- Hosting: GitHub **https://github.com/manojb08/Klenz** (public, branch `main`) → **Railway** builds the root `Dockerfile` (Node builds `frontend/dist`, then uvicorn on `$PORT`, proxy headers trusted, non-root) with a Railway MySQL (`DATABASE_URL=${{MySQL.MYSQL_URL}}`). Every push to `main` redeploys. Steps, variables and go-live checklist: `DEPLOY.md`.
+- Hosting (all free): GitHub **https://github.com/manojb08/Klenz** (public, branch `main`). `.github/workflows/deploy.yml` runs pytest (SQLite, then MySQL 8.4 with Aiven-like strictness: TLS only, primary keys required, ANSI sql_mode), lint + build and `docker build`. On `main` it then POSTs the Render deploy hook with `ref=<sha>` (secret `RENDER_DEPLOY_HOOK_URL`) and polls `SITE_URL/api/health` until `commit` matches. **Render** free web service from `render.yaml` (Docker, Singapore, auto-deploy off, sleeps after 15 min idle) serves the site + API. **Aiven** free MySQL: `DATABASE_URL` = its Service URI (`mysql://…?ssl-mode=REQUIRED`). Root `Dockerfile`: Node builds `frontend/dist`, then uvicorn on `$PORT`, proxy headers trusted, non-root. GitHub Pages is not an option (GitHub forbids shops and password logins there). Steps and checklist: `DEPLOY.md`.
 
 ## Commands (Windows, from `klenz-website/`)
 | Task | Command |
@@ -20,15 +20,15 @@ Online shop + admin for **Klenz** tissue products (Pollachi, Tamil Nadu). Built 
 | Reset admin password | `cd backend` → `.venv\Scripts\python -m app.cli set-password admin@klenz.com` |
 | Create DB + starter data | `.venv\Scripts\python -m app.cli init-db` (also happens on API start) |
 | MySQL DDL reference | `.venv\Scripts\python -m app.cli schema-sql > sql\schema.sql` |
-| Ship a change to the live site | `git add -A` → `git commit -m "…"` → `git push` (Railway rebuilds; database untouched) |
+| Ship a change to the live site | `git add -A` → `git commit -m "…"` → `git push` (Actions tests, deploys to Render and waits until live, about 10 min; database untouched; `.md`/`Images/`/`tools/`-only pushes don't deploy) |
 | Production image locally | `docker build -t klenz .` (Docker Desktop; on this PC Norton's HTTPS scanning breaks pip/npm inside Docker, so a local test build needs Norton's root certificate added. Railway builds are not affected) |
 | Media (needs `pip install -r tools/requirements.txt` in any Python env) | `python tools/crop_catalogue.py` (product photos), `python tools/make_brand_images.py` (logo, favicons, hero photo), `python tools/make_videos.py [facial\|napkins\|rolls\|hero]` |
 
 URLs: site http://localhost:5173 · admin http://localhost:5173/admin · API docs http://localhost:8000/api/docs. Admin login is in `backend/.env` (`ADMIN_EMAIL`, `ADMIN_PASSWORD`, used only to create the first admin).
 
 ## Backend map (`backend/app/`)
-- `main.py` `create_app()`: lifespan creates the MySQL database if missing → `create_all` tables → `seed_database`; mounts routers; serves `frontend/dist`.
-- `config.py` `AppConfig` (env vars / `.env`; plain `mysql://` URLs are switched to PyMySQL). `database.py` engine, `UTCDateTime` (naive UTC, whole seconds), MySQL charset/InnoDB handling, `get_db`.
+- `main.py` `create_app()`: lifespan creates the MySQL database if missing → `create_all` tables → `seed_database`; mounts routers; `/api/health` (status, database, deployed `commit`); serves `frontend/dist`.
+- `config.py` `AppConfig` (env vars / `.env`; `git_commit` from `GIT_COMMIT`/`RENDER_GIT_COMMIT`/`RAILWAY_GIT_COMMIT_SHA`). `database.py` `parse_db_url` (plain `mysql://` → PyMySQL, `ssl-mode=REQUIRED` → encrypted without cert check), engine, `UTCDateTime` (naive UTC, whole seconds), MySQL charset/InnoDB handling, `get_db`.
 - `models.py` tables `admin_users, products (name, category, spec = pack size, description, art, tint, image_url, is_live, sort_order), orders (no totals), order_items (product_name + product_spec snapshot, quantity), videos, page_content, site_settings`. Order reference = `KZ-` + (10000 + id).
 - `schemas.py` request/response models + validators (`is_link`: `https://…` or `/path`). `content_schema.py` **every editable site text**: `PAGES` → fields `page.key` with label, default, kind text/textarea/url.
 - `store.py` `SETTING_DEFAULTS` (WhatsApp, phones, email, address, hours, country code) + key/value read/write. `seed.py` first-run data: the 10 catalogue products, 3 videos, page text, settings, 3 sample enquiries; runs once (marker `_seeded_at`); `ensure_admin`.

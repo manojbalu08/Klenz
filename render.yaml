@@ -1,0 +1,22 @@
+# Render Blueprint (render.com → New → Blueprint): one free web service built from the
+# Dockerfile, in Singapore. The database is Aiven's free MySQL. GitHub Actions starts each
+# deploy after the tests pass, so Render's own auto-deploy is off. Setup: DEPLOY.md.
+services:
+  - type: web
+    name: klenz
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /api/health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: DATABASE_URL # Aiven → klenz-mysql → Service URI (mysql://…?ssl-mode=REQUIRED)
+        sync: false
+      - key: ADMIN_PASSWORD # first /admin login; change it later in Admin → Settings
+        sync: false
+      - key: ADMIN_EMAIL
+        value: admin@klenz.com
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SEED_SAMPLE_DATA # three sample enquiries for the client demo
+        value: "true"

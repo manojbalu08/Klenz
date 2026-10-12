@@ -95,3 +95,9 @@ def test_orders_are_rate_limited(make_client: ClientFactory) -> None:
 
 def test_health(client: TestClient) -> None:
     assert client.get("/api/health").json()["status"] == "ok"
+
+
+def test_health_reports_the_deployed_commit(make_client: ClientFactory) -> None:
+    # The GitHub Actions deploy waits until this matches the commit it pushed.
+    client = make_client(git_commit="abc123")
+    assert client.get("/api/health").json()["commit"] == "abc123"
