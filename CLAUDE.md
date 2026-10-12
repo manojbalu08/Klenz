@@ -1,6 +1,6 @@
 # Klenz website — project guide
 
-Online shop + admin for **Klenz** tissue products (Pollachi, Tamil Nadu). Built from the design "Kenz Website Design.html"; the logo, packaging, catalogue and visiting card say **Klenz**. **No prices anywhere**: shoppers pick products and quantities, send the order on WhatsApp, and Klenz replies with a quote. Read this file instead of exploring the code; open only the files a change needs.
+Online shop + admin for **Klenz** tissue products (Pollachi, Tamil Nadu). Built from the design "Kenz Website Design.html"; the logo, packaging, catalogue and visiting card say **Klenz**. **No prices anywhere**: shoppers pick products and quantities, send the order on WhatsApp, and Klenz replies with a quote. Read this file instead of exploring the code; open only the files a change needs. Live: https://klenz-tissue.onrender.com. History, decisions and open client items: `CHANGELOG.md`.
 
 ## Stack and ports
 - `frontend/` React 19 + TypeScript 6 + Vite 8, React Router 8 (declarative `<Routes>`), CSS Modules, no UI library. Dev server :5173 proxies `/api` to :8000.

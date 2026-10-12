@@ -10,6 +10,18 @@ The site is hosted for free:
 
 Every push to `main` runs the checks in GitHub Actions: backend tests (on SQLite, and on MySQL 8.4 set up as strictly as Aiven), website lint and build, and the Docker image. If they pass, Actions tells Render to deploy exactly that commit and waits until it is live. If anything fails, nothing is deployed and the site keeps the previous version.
 
+## Current setup (13 October 2026)
+
+| What | Where |
+|---|---|
+| Code | GitHub `manojbalu08/Klenz`, branch `main` |
+| Live site | **https://klenz-tissue.onrender.com** (Render service `klenz-tissue`, free, Singapore) |
+| Database | Aiven project `klenz`: MySQL 8.4, plan Free-1-1gb, DigitalOcean Bangalore |
+| Admin | `/admin`, login `admin@klenz.com`; first password set in Render (`ADMIN_PASSWORD`), change it in **Admin → Settings** |
+| Automatic deploys | Need the GitHub secret `RENDER_DEPLOY_HOOK_URL` and variable `SITE_URL` (step 3 below) |
+
+Passwords and the database link are kept only in Render and Aiven, never in this repository. Project history and open items: [CHANGELOG.md](CHANGELOG.md).
+
 Limits of the free plans:
 - **Render puts the site to sleep after 15 minutes without visitors.** The next visitor waits about a minute while it wakes up. Tell the client.
 - **Aiven may switch off a free database it sees as unused.** It emails first; switch it back on in the Aiven console.
@@ -87,7 +99,7 @@ Change them in Render → **klenz-tissue → Environment**; Render restarts the 
 
 ## Live database
 
-The Aiven console (**klenz-mysql → Overview**) shows the host, port, user and password. Use them in MySQL Workbench or HeidiSQL with SSL turned on.
+The Aiven console (project **klenz** → the MySQL service → **Overview**) shows the host, port, user and password. Use them in MySQL Workbench or HeidiSQL with SSL turned on.
 
 **Lost admin password:** in Command Prompt from `backend`:
 

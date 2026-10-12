@@ -6,7 +6,14 @@ Online shop and admin dashboard for Klenz tissue products. Customers pick produc
 - **Backend:** Python FastAPI + SQLAlchemy (`backend/`)
 - **Database:** MySQL
 
-Developers (and Claude Code): see [CLAUDE.md](CLAUDE.md) for the code map and how to make common changes.
+Live for review: **https://klenz-tissue.onrender.com**
+
+| Document | For |
+|---|---|
+| [README.md](README.md) | Running the site on your PC (this page) |
+| [DEPLOY.md](DEPLOY.md) | Hosting: current setup, one-time setup, shipping updates, going live |
+| [CHANGELOG.md](CHANGELOG.md) | What was built and decided so far, open items |
+| [CLAUDE.md](CLAUDE.md) | Code map and how to make common changes (developers and Claude Code) |
 
 ## Run it on this computer
 
