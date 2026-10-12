@@ -3,7 +3,7 @@
 # deploy after the tests pass, so Render's own auto-deploy is off. Setup: DEPLOY.md.
 services:
   - type: web
-    name: klenz
+    name: klenz-tissue # the address becomes https://klenz-tissue.onrender.com; fixed once created
     runtime: docker
     plan: free
     region: singapore

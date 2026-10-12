@@ -5,7 +5,7 @@ The site is hosted for free:
 | Part | Service | Plan |
 |---|---|---|
 | Code and automatic deploys | GitHub + GitHub Actions ([.github/workflows/deploy.yml](.github/workflows/deploy.yml)) | Free (public repo) |
-| Website, admin and API | Render web service ([render.yaml](render.yaml), built from the [Dockerfile](Dockerfile)) | Free, address like `https://klenz.onrender.com` |
+| Website, admin and API | Render web service ([render.yaml](render.yaml), built from the [Dockerfile](Dockerfile)) | Free, address `https://klenz-tissue.onrender.com` |
 | MySQL database | Aiven for MySQL | Free: 1 GB, backups included |
 
 Every push to `main` runs the checks in GitHub Actions: backend tests (on SQLite, and on MySQL 8.4 set up as strictly as Aiven), website lint and build, and the Docker image. If they pass, Actions tells Render to deploy exactly that commit and waits until it is live. If anything fails, nothing is deployed and the site keeps the previous version.
@@ -26,16 +26,16 @@ Do step 2 right away: Aiven may switch off a new free database that nothing conn
 
 ### 2. Website: Render
 1. Open **https://render.com/deploy?repo=https://github.com/manojbalu08/Klenz** and sign up / sign in with the GitHub account **manojbalu08**. (Or, in the Render dashboard: **New → Blueprint** → `manojbalu08/Klenz`.)
-2. Render reads `render.yaml` and shows one free service, **klenz**, in Singapore. It asks for two values:
+2. Render reads `render.yaml` and shows one free service, **klenz-tissue**, in Singapore. It asks for two values:
    - `DATABASE_URL`: the Aiven Service URI
    - `ADMIN_PASSWORD`: a strong password for `/admin` (the login is `admin@klenz.com`)
-3. Click **Apply** (or **Deploy Blueprint**). The first build takes 5–10 minutes. The address is at the top of the **klenz** service page, e.g. `https://klenz.onrender.com`. Open it and sign in at `/admin`.
+3. Click **Apply** (or **Deploy Blueprint**). The first build takes 5–10 minutes. The address is at the top of the **klenz-tissue** service page: `https://klenz-tissue.onrender.com`. Open it and sign in at `/admin`.
 
 ### 3. Connect GitHub Actions
-1. Render → **klenz** service → **Settings → Deploy Hook** → copy the URL.
+1. Render → **klenz-tissue** service → **Settings → Deploy Hook** → copy the URL.
 2. GitHub → `manojbalu08/Klenz` → **Settings → Secrets and variables → Actions**:
    - **Secrets → New repository secret:** name `RENDER_DEPLOY_HOOK_URL`, value the deploy hook URL.
-   - **Variables → New repository variable:** name `SITE_URL`, value the Render address (e.g. `https://klenz.onrender.com`).
+   - **Variables → New repository variable:** name `SITE_URL`, value the Render address `https://klenz-tissue.onrender.com`.
 3. **Actions → Test and deploy → Run workflow.** When it turns green, the site runs that commit.
 
 ### 4. Share the link
@@ -63,7 +63,7 @@ A deploy does **not** change:
 ## Going live
 
 1. Finish the client's changes as above.
-2. **Own domain (optional).** Buy it (about ₹500–1,500 a year). Then Render → **klenz → Settings → Custom Domains** → add `www.yourdomain.com` and create the DNS records Render shows at your domain provider. HTTPS stays free. Change the `SITE_URL` variable to the new address.
+2. **Own domain (optional).** Buy it (about ₹500–1,500 a year). Then Render → **klenz-tissue → Settings → Custom Domains** → add `www.yourdomain.com` and create the DNS records Render shows at your domain provider. HTTPS stays free. Change the `SITE_URL` variable to the new address.
 3. **No sleeping (optional, paid).** Switch the Render service to a paid instance type, or move to Railway (about US$5 a month, see [Other hosts](#other-hosts)).
 4. Before announcing the site:
    - **Admin → Settings:** change the admin password; check the WhatsApp number, phones, email, address (PIN **642001** on the visiting card, **642002** in the catalogue) and opening hours.
@@ -73,7 +73,7 @@ A deploy does **not** change:
 
 ## Settings (environment variables)
 
-Change them in Render → **klenz → Environment**; Render restarts the site.
+Change them in Render → **klenz-tissue → Environment**; Render restarts the site.
 
 | Variable | When | What it does |
 |---|---|---|
