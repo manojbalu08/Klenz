@@ -74,7 +74,7 @@ cd backend
 
 ## Going live
 
-See **[DEPLOY.md](DEPLOY.md)**. Hosting is free: GitHub Actions tests every push to `manojb08/Klenz` and deploys it to Render (website, admin and API in one Docker container), with the database on Aiven's free MySQL. It covers the one-time setup, shipping updates with `git push`, the custom domain and the go-live checklist.
+See **[DEPLOY.md](DEPLOY.md)**. Hosting is free: GitHub Actions tests every push to `manojbalu08/Klenz` and deploys it to Render (website, admin and API in one Docker container), with the database on Aiven's free MySQL. It covers the one-time setup, shipping updates with `git push`, the custom domain and the go-live checklist.
 
 ## Tests
 

@@ -25,15 +25,15 @@ Limits of the free plans:
 Do step 2 right away: Aiven may switch off a new free database that nothing connects to in its first hours.
 
 ### 2. Website: Render
-1. Sign up at https://render.com with the GitHub account **manojb08**.
-2. **New → Blueprint** → choose `manojb08/Klenz`. Render reads `render.yaml` and asks for two values:
+1. Sign up at https://render.com with the GitHub account **manojbalu08**.
+2. **New → Blueprint** → choose `manojbalu08/Klenz`. Render reads `render.yaml` and asks for two values:
    - `DATABASE_URL`: the Aiven Service URI
    - `ADMIN_PASSWORD`: a strong password for `/admin` (the login is `admin@klenz.com`)
 3. Click **Apply**. The first build takes 5–10 minutes. The address is at the top of the **klenz** service page, e.g. `https://klenz.onrender.com`. Open it and sign in at `/admin`.
 
 ### 3. Connect GitHub Actions
 1. Render → **klenz** service → **Settings → Deploy Hook** → copy the URL.
-2. GitHub → `manojb08/Klenz` → **Settings → Secrets and variables → Actions**:
+2. GitHub → `manojbalu08/Klenz` → **Settings → Secrets and variables → Actions**:
    - **Secrets → New repository secret:** name `RENDER_DEPLOY_HOOK_URL`, value the deploy hook URL.
    - **Variables → New repository variable:** name `SITE_URL`, value the Render address (e.g. `https://klenz.onrender.com`).
 3. **Actions → Test and deploy → Run workflow.** When it turns green, the site runs that commit.
@@ -98,6 +98,6 @@ set DATABASE_URL=<Aiven Service URI>
 
 ## Other hosts
 
-The Dockerfile runs on any host that runs containers. **Railway** (paid, no sleeping, about US$5 a month): **New Project → Deploy from GitHub repo → manojb08/Klenz**, add **Database → MySQL**, then set the variables `DATABASE_URL=${{MySQL.MYSQL_URL}}`, `SECRET_KEY`, `ADMIN_PASSWORD` and `PORT=8000`, and click **Settings → Networking → Generate Domain**. Railway deploys on every push by itself; its Settings also show a deploy hook if you want GitHub Actions to start the deploys.
+The Dockerfile runs on any host that runs containers. **Railway** (paid, no sleeping, about US$5 a month): **New Project → Deploy from GitHub repo → manojbalu08/Klenz**, add **Database → MySQL**, then set the variables `DATABASE_URL=${{MySQL.MYSQL_URL}}`, `SECRET_KEY`, `ADMIN_PASSWORD` and `PORT=8000`, and click **Settings → Networking → Generate Domain**. Railway deploys on every push by itself; its Settings also show a deploy hook if you want GitHub Actions to start the deploys.
 
 Every Actions run also builds the image, so you don't need Docker on your PC. To build it locally anyway: `docker build -t klenz .`
