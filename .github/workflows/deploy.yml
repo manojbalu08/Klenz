@@ -9,13 +9,14 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Runners are pinned to Ubuntu 24.04 so a new ubuntu-latest image cannot break a deploy.
 permissions:
   contents: read
 
 jobs:
   backend:
     name: Backend tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
@@ -51,7 +52,7 @@ jobs:
 
   website:
     name: Website lint and build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     defaults:
       run:
@@ -69,7 +70,7 @@ jobs:
 
   image:
     name: Docker image (what Render builds)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
@@ -79,7 +80,7 @@ jobs:
     name: Deploy to Render
     needs: [backend, website, image]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     concurrency:
       group: deploy-production
