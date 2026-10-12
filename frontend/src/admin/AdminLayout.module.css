@@ -1,0 +1,169 @@
+.shell {
+  --a-ink: #0a1f44;
+  --a-bg: #eef3fa;
+  --a-muted: #46608a;
+  --a-accent: #1d5fe0;
+  --a-line: #dbe4f0;
+  --a-line-soft: #e8eef7;
+  --a-live: #dceaff;
+  --a-warm: #fdefc6;
+  --a-input-border: #c3cfe0;
+  --a-cream: #f7faff;
+  --focus: #1d5fe0;
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--a-ink);
+  background: var(--a-bg);
+}
+
+/* Plain text links only; styled links and buttons set their own colours. */
+.shell a:not([class]) {
+  color: var(--a-accent);
+}
+
+.shell a:not([class]):hover {
+  color: var(--a-ink);
+}
+
+/* ── Sidebar ──────────────────────────────────────────── */
+
+.sidebar {
+  --focus: #22d3ee;
+  flex: 0 0 260px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 28px 20px;
+  background: var(--a-ink);
+  color: var(--a-cream);
+}
+
+.shell .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+  color: var(--a-cream);
+  text-decoration: none;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.shell .link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 14px;
+  color: #c9d6ee;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.shell .link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.shell .active,
+.shell .active:hover {
+  background: var(--a-accent);
+  color: #fff;
+}
+
+.shell .viewSite {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1.5px solid #2b4170;
+  color: var(--a-cream);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* ── Main area ────────────────────────────────────────── */
+
+.main {
+  flex: 999 1 640px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 28px clamp(16px, 3vw, 40px) 48px;
+}
+
+/* Tablets and phones: the sidebar becomes a bar across the top. */
+@media (max-width: 960px) {
+  .sidebar {
+    flex: 1 1 100%;
+    /* Lets the menu scroll sideways instead of widening the page. */
+    min-width: 0;
+    position: static;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 16px;
+    padding: 14px 16px;
+  }
+
+  .nav {
+    order: 3;
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 4px;
+  }
+
+  .shell .link {
+    flex: none;
+    min-height: 44px;
+    padding: 0 14px;
+  }
+
+  .shell .viewSite {
+    margin: 0 0 0 auto;
+    min-height: 40px;
+  }
+
+  .main {
+    flex-basis: 100%;
+  }
+}
+
+/* Large monitors and TVs: scale the whole layout up so it fills the screen and reads from a distance. */
+@media (min-width: 1880px) {
+  .shell {
+    zoom: 1.1;
+  }
+}
+
+@media (min-width: 2400px) {
+  .shell {
+    zoom: 1.33;
+  }
+}
+
+@media (min-width: 3200px) {
+  .shell {
+    zoom: 2;
+  }
+}

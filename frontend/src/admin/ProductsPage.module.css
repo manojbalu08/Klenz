@@ -1,0 +1,23 @@
+.table {
+  min-width: 720px;
+}
+
+.product {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 420px;
+}
+
+.thumb {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  object-fit: cover;
+  background: var(--soft);
+}
+
+.thumb[data-tint='soft2'] {
+  background: var(--soft2);
+}

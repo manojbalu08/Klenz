@@ -1,0 +1,223 @@
+/* Building blocks shared by the shop pages, taken from the design's styles. */
+
+.section {
+  padding: 80px clamp(20px, 5vw, 64px);
+}
+
+.container {
+  max-width: 1232px;
+  margin: 0 auto;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+/* Soft hero band at the top of each page, with its decorative circles. */
+.pageHero {
+  position: relative;
+  overflow: hidden;
+  background: var(--soft);
+}
+
+.heroInner {
+  position: relative;
+  max-width: 1232px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.badge {
+  align-self: flex-start;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.lead {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.display {
+  margin: 0;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+}
+
+.highlight {
+  color: var(--primary);
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.eyebrow {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--primary);
+}
+
+.title {
+  margin: 0;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+  font-size: clamp(34px, 4.4vw, 56px);
+  letter-spacing: -1.2px;
+  line-height: 1.05;
+}
+
+.note {
+  font-size: 15px;
+  color: var(--muted);
+}
+
+/* Cards in the "3 steps" and "values" rows. */
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.card {
+  flex: 1 1 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 36px;
+  border-radius: 32px;
+  background: var(--soft);
+}
+
+.card:nth-child(2) {
+  background: var(--soft2);
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 26px;
+}
+
+.cardText {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* Pill buttons and links. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.15s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+}
+
+.primary:hover {
+  box-shadow: 0 10px 24px rgba(29, 95, 224, 0.35);
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.button:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.large {
+  min-height: 56px;
+  padding: 0 34px;
+  font-size: 18px;
+}
+
+.primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.accent {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.outline {
+  background: #fff;
+  border: 2px solid var(--ink);
+  color: var(--ink);
+}
+
+.ghost {
+  background: transparent;
+  border: 2px solid var(--ink);
+  color: var(--ink);
+}
+
+/* Round − / + quantity buttons. */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stepButton {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.stepButton:last-child {
+  background: var(--primary);
+  color: #fff;
+}
+
+.stepCount {
+  min-width: 32px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 18px;
+}

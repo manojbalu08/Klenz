@@ -1,0 +1,10 @@
+.art {
+  position: absolute;
+  inset: 0;
+}
+
+.shape {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}

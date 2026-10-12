@@ -1,0 +1,173 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 14px clamp(20px, 4vw, 56px);
+  background: var(--bg);
+  border-bottom: 2px solid var(--soft);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+}
+
+.wordmark {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: -0.5px;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+}
+
+.navItem {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.navItem.active {
+  background: var(--ink);
+  color: #fff;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.cart {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--ink);
+  font-size: 14px;
+  /* Re-mounted on every change, so it pops when something is added. */
+  animation: pop 0.35s ease-out;
+}
+
+.cart,
+.admin {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.cart:hover,
+.admin:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(10, 31, 68, 0.18);
+}
+
+.navItem {
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.navItem:not(.active):hover {
+  background: var(--soft);
+}
+
+@keyframes pop {
+  40% {
+    transform: scale(1.35);
+  }
+}
+
+.admin {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none;
+}
+
+/* Phones: a lighter header that scrolls away (a floating cart button takes over). */
+@media (max-width: 760px) {
+  .header {
+    position: static;
+    padding: 12px 16px;
+  }
+
+  .nav {
+    order: 3;
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 4px;
+  }
+
+  .navItem {
+    flex: none;
+    padding: 0 14px;
+  }
+
+  .cart {
+    padding: 0 14px;
+  }
+
+  .admin {
+    padding: 0 14px;
+  }
+}
+
+@media (max-width: 400px) {
+  .wordmark {
+    display: none;
+  }
+}

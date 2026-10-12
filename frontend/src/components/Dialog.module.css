@@ -1,0 +1,59 @@
+.dialog {
+  padding: 0;
+  border: none;
+  color: inherit;
+  max-width: none;
+  max-height: none;
+}
+
+.dialog:focus {
+  outline: none;
+}
+
+.dialog::backdrop {
+  background: rgba(10, 20, 20, 0.55);
+}
+
+.body {
+  height: 100%;
+}
+
+/* Cart: full-height panel on the right, as in the design. */
+.drawer {
+  margin: 0 0 0 auto;
+  width: 100%;
+  max-width: 440px;
+  height: 100%;
+  background: var(--bg);
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.25);
+}
+
+.drawer[open] {
+  animation: slide-in 0.25s ease-out;
+}
+
+/* Admin forms. */
+.modal {
+  width: min(640px, calc(100% - 32px));
+  max-height: calc(100% - 48px);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(15, 47, 43, 0.25);
+}
+
+.modal[open] {
+  animation: pop-in 0.18s ease-out;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}

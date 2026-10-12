@@ -1,0 +1,83 @@
+.count {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(10, 31, 68, 0.08);
+  font-size: 13px;
+}
+
+[aria-pressed='true'] > .count {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.search {
+  flex: 0 1 320px;
+  min-height: 46px;
+}
+
+.table {
+  min-width: 760px;
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover td {
+  background: var(--a-cream);
+}
+
+.items {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--a-muted);
+}
+
+.details {
+  margin: 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 10px 20px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: var(--a-cream);
+}
+
+.details dt {
+  font-weight: 700;
+}
+
+.details dd {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.itemsTable {
+  min-width: 420px;
+}
+
+.itemsTable tfoot td {
+  padding: 14px 8px 0;
+  border-top: 1.5px solid var(--a-line);
+  font-weight: 700;
+}
+
+.dialogActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dialogActions .whatsapp {
+  background: #0e7a3f;
+  color: #fff;
+}
+
+@media (max-width: 560px) {
+  .search {
+    flex-basis: 100%;
+  }
+}
