@@ -7,6 +7,7 @@ Online shop + admin for **Klenz** tissue products (Pollachi, Tamil Nadu). Built 
 - `backend/` FastAPI + SQLAlchemy 2.1 (sync) + PyMySQL, Pydantic v2, PyJWT. Port :8000. In production it also serves `frontend/dist` (one port, SPA fallback).
 - Database: MySQL via `DATABASE_URL` in `backend/.env`. This PC: WAMP **MySQL 5.0.27**, user `root`, no password, database `klenz`, **`?charset=utf8`** (5.0 has no utf8mb4; use utf8mb4 on MySQL 5.5+/8). Tests use SQLite unless `TEST_DATABASE_URL` is set.
 - `Images/` the client's originals (logo, catalogue `products.jpeg`, product photos, visiting card). `tools/` scripts that turn them into web images and videos.
+- Hosting: GitHub **https://github.com/manojb08/Klenz** (public, branch `main`) → **Railway** builds the root `Dockerfile` (Node builds `frontend/dist`, then uvicorn on `$PORT`, proxy headers trusted, non-root) with a Railway MySQL (`DATABASE_URL=${{MySQL.MYSQL_URL}}`). Every push to `main` redeploys. Steps, variables and go-live checklist: `DEPLOY.md`.
 
 ## Commands (Windows, from `klenz-website/`)
 | Task | Command |
@@ -19,13 +20,15 @@ Online shop + admin for **Klenz** tissue products (Pollachi, Tamil Nadu). Built 
 | Reset admin password | `cd backend` → `.venv\Scripts\python -m app.cli set-password admin@klenz.com` |
 | Create DB + starter data | `.venv\Scripts\python -m app.cli init-db` (also happens on API start) |
 | MySQL DDL reference | `.venv\Scripts\python -m app.cli schema-sql > sql\schema.sql` |
+| Ship a change to the live site | `git add -A` → `git commit -m "…"` → `git push` (Railway rebuilds; database untouched) |
+| Production image locally | `docker build -t klenz .` (Docker Desktop; on this PC Norton's HTTPS scanning breaks pip/npm inside Docker, so a local test build needs Norton's root certificate added. Railway builds are not affected) |
 | Media (needs `pip install -r tools/requirements.txt` in any Python env) | `python tools/crop_catalogue.py` (product photos), `python tools/make_brand_images.py` (logo, favicons, hero photo), `python tools/make_videos.py [facial\|napkins\|rolls\|hero]` |
 
 URLs: site http://localhost:5173 · admin http://localhost:5173/admin · API docs http://localhost:8000/api/docs. Admin login is in `backend/.env` (`ADMIN_EMAIL`, `ADMIN_PASSWORD`, used only to create the first admin).
 
 ## Backend map (`backend/app/`)
 - `main.py` `create_app()`: lifespan creates the MySQL database if missing → `create_all` tables → `seed_database`; mounts routers; serves `frontend/dist`.
-- `config.py` `AppConfig` (env vars / `.env`). `database.py` engine, `UTCDateTime` (naive UTC, whole seconds), MySQL charset/InnoDB handling, `get_db`.
+- `config.py` `AppConfig` (env vars / `.env`; plain `mysql://` URLs are switched to PyMySQL). `database.py` engine, `UTCDateTime` (naive UTC, whole seconds), MySQL charset/InnoDB handling, `get_db`.
 - `models.py` tables `admin_users, products (name, category, spec = pack size, description, art, tint, image_url, is_live, sort_order), orders (no totals), order_items (product_name + product_spec snapshot, quantity), videos, page_content, site_settings`. Order reference = `KZ-` + (10000 + id).
 - `schemas.py` request/response models + validators (`is_link`: `https://…` or `/path`). `content_schema.py` **every editable site text**: `PAGES` → fields `page.key` with label, default, kind text/textarea/url.
 - `store.py` `SETTING_DEFAULTS` (WhatsApp, phones, email, address, hours, country code) + key/value read/write. `seed.py` first-run data: the 10 catalogue products, 3 videos, page text, settings, 3 sample enquiries; runs once (marker `_seeded_at`); `ensure_admin`.
@@ -63,6 +66,6 @@ URLs: site http://localhost:5173 · admin http://localhost:5173/admin · API doc
 - TypeScript: `erasableSyntaxOnly` (no enums or parameter properties), `verbatimModuleSyntax` (`import type`). React 19: `<Context value>` providers, `<title>` inside pages.
 - MySQL compatibility: indexed VARCHAR ≤191 chars, no JSON columns or CHECK constraints, datetimes via `UTCDateTime`. SQLAlchemy `URL.set(database=None)` means "unchanged", so use `database=""`.
 - Starlette 1.x TestClient needs `httpx2` (in requirements-dev.txt).
-- Starter data is added once. To start a dev database fresh: drop database `klenz`, restart the API.
+- Starter data is added once. To start a dev database fresh: drop database `klenz`, restart the API. On the live site the admin is the source of truth: changes to `seed.py` or to existing default texts never reach it (new `content_schema` fields do), and new columns need an `ALTER TABLE` on the live MySQL before the push.
 - Open question for the client: the visiting card says Pollachi **642001**, the catalogue **642002** (setting `address`).
 - After changes: backend `pytest`; frontend `npm run build` + `npm run lint`; check phone/tablet/desktop widths in the browser's device toolbar.

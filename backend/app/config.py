@@ -3,6 +3,7 @@
 from functools import lru_cache
 from pathlib import Path
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
@@ -14,6 +15,7 @@ class AppConfig(BaseSettings):
     )
 
     # SQLAlchemy URL, e.g. mysql+pymysql://user:password@127.0.0.1:3306/klenz?charset=utf8mb4
+    # Plain mysql://… URLs from hosting panels (Railway's MYSQL_URL) work too.
     database_url: str = "mysql+pymysql://root:@127.0.0.1:3306/klenz?charset=utf8mb4"
     # Create the MySQL database on startup when it does not exist yet.
     db_auto_create: bool = True
@@ -43,6 +45,15 @@ class AppConfig(BaseSettings):
 
     # Built React app (npm run build) that FastAPI serves in production.
     frontend_dist: Path = BACKEND_DIR.parent / "frontend" / "dist"
+
+    @field_validator("database_url")
+    @classmethod
+    def _use_pymysql(cls, url: str) -> str:
+        """SQLAlchemy reads mysql:// as the mysqlclient driver; this app ships PyMySQL."""
+        url = url.strip()
+        if url.startswith("mysql://"):
+            return "mysql+pymysql://" + url.removeprefix("mysql://")
+        return url
 
 
 @lru_cache

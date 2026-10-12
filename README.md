@@ -74,15 +74,7 @@ cd backend
 
 ## Going live
 
-1. `cd frontend && npm run build`
-2. On the server, set in `backend/.env`: the live `DATABASE_URL`, a long random `SECRET_KEY`, a strong `ADMIN_PASSWORD`.
-3. `cd backend && .venv\Scripts\python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers`
-
-FastAPI then serves the website and the API on one port. Put it behind a web server with HTTPS (nginx, IIS or Caddy). Before announcing the site:
-
-- Check **Admin → Settings** (WhatsApp number, phones, email, address, hours).
-- Fill in the About Us placeholders in **Admin → Page content**.
-- Delete the three "Sample …" enquiries in **Admin → Enquiries** (or set `SEED_SAMPLE_DATA=false` before the live database is first created).
+See **[DEPLOY.md](DEPLOY.md)**: the code is on GitHub (`manojb08/Klenz`) and deploys to Railway as one Docker container with a MySQL database. It covers the review link for the client, shipping updates with `git push`, the custom domain and the go-live checklist.
 
 ## Tests
 
