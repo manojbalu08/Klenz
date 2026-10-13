@@ -9,8 +9,9 @@ from sqlalchemy.orm import Session
 
 from .config import AppConfig
 from .content_schema import DEFAULTS as CONTENT_DEFAULTS
+from .content_schema import PREVIOUS_DEFAULTS
 from .database import utcnow
-from .models import AdminUser, Order, OrderItem, PageContent, Product, SiteSetting, Video
+from .models import ZERO, AdminUser, Order, OrderItem, PageContent, Product, SiteSetting, Video
 from .security import hash_password
 from .store import SETTING_DEFAULTS
 
@@ -61,6 +62,7 @@ SAMPLE_ORDERS = (
 def seed_database(session: Session, config: AppConfig) -> None:
     ensure_admin(session, config)
     if session.get(SiteSetting, SEED_MARKER) is not None:
+        upgrade_default_content(session)
         return
 
     products: list[Product] = []
@@ -90,13 +92,28 @@ def seed_database(session: Session, config: AppConfig) -> None:
                           created_at=created, updated_at=created)
             for index, quantity in lines:
                 product = products[index]
+                price = product.price or ZERO
                 order.items.append(OrderItem(product_id=product.id, product_name=product.name,
-                                             product_spec=product.spec, quantity=quantity))
+                                             product_spec=product.spec, quantity=quantity,
+                                             unit_price=price, line_total=price * quantity))
+            order.total = sum((item.line_total for item in order.items), ZERO)
             session.add(order)
 
     session.add(SiteSetting(key=SEED_MARKER, value=utcnow().isoformat()))
     session.commit()
     log.info("Added the Klenz catalogue, videos and page text.")
+
+
+def upgrade_default_content(session: Session) -> None:
+    """Swap page text that still has an earlier default (nobody edited it) for the current default."""
+    changed = False
+    for row in session.scalars(select(PageContent).where(PageContent.key.in_(PREVIOUS_DEFAULTS))):
+        if row.value in PREVIOUS_DEFAULTS[row.key]:
+            row.value = CONTENT_DEFAULTS[row.key]
+            changed = True
+    if changed:
+        session.commit()
+        log.info("Updated page text that still had an earlier default.")
 
 
 def ensure_admin(session: Session, config: AppConfig) -> None:

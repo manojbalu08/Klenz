@@ -27,20 +27,6 @@
   top: 12px;
 }
 
-.announcement {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 8px 24px;
-  padding: 10px 20px;
-  background: var(--accent);
-  color: var(--ink);
-  font-size: 15px;
-  font-weight: 700;
-  text-align: center;
-}
-
 .floatingCart {
   display: none;
 }

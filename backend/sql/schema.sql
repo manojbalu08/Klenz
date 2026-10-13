@@ -22,6 +22,10 @@ CREATE TABLE orders (
 	address TEXT NOT NULL, 
 	note TEXT NOT NULL, 
 	status VARCHAR(20) NOT NULL, 
+	total NUMERIC(10, 2) NOT NULL DEFAULT '0', 
+	payment_method VARCHAR(10) NOT NULL DEFAULT 'later', 
+	payment_status VARCHAR(10) NOT NULL DEFAULT 'pending', 
+	payment_ref VARCHAR(40) NOT NULL DEFAULT '', 
 	created_at DATETIME NOT NULL, 
 	updated_at DATETIME NOT NULL, 
 	PRIMARY KEY (id)
@@ -42,6 +46,7 @@ CREATE TABLE products (
 	category VARCHAR(60) NOT NULL, 
 	description VARCHAR(500) NOT NULL, 
 	spec VARCHAR(120) NOT NULL, 
+	price NUMERIC(10, 2) NOT NULL DEFAULT '0', 
 	art VARCHAR(20) NOT NULL, 
 	tint VARCHAR(20) NOT NULL, 
 	image_url VARCHAR(500) NOT NULL, 
@@ -77,6 +82,8 @@ CREATE TABLE order_items (
 	product_name VARCHAR(120) NOT NULL, 
 	product_spec VARCHAR(120) NOT NULL, 
 	quantity INTEGER NOT NULL, 
+	unit_price NUMERIC(10, 2) NOT NULL DEFAULT '0', 
+	line_total NUMERIC(10, 2) NOT NULL DEFAULT '0', 
 	PRIMARY KEY (id), 
 	FOREIGN KEY(order_id) REFERENCES orders (id) ON DELETE CASCADE, 
 	FOREIGN KEY(product_id) REFERENCES products (id) ON DELETE SET NULL

@@ -15,7 +15,14 @@ from sqlalchemy.orm import Session
 from sqlalchemy.schema import CreateIndex, CreateTable
 
 from .config import get_config
-from .database import Base, apply_mysql_table_options, create_db_engine, ensure_mysql_database, mysql_charset
+from .database import (
+    Base,
+    add_missing_columns,
+    apply_mysql_table_options,
+    create_db_engine,
+    ensure_mysql_database,
+    mysql_charset,
+)
 from .models import AdminUser
 from .security import hash_password
 from .seed import seed_database
@@ -28,6 +35,7 @@ def init_db() -> None:
     engine = create_db_engine(config.database_url)
     apply_mysql_table_options(engine)
     Base.metadata.create_all(engine)
+    add_missing_columns(engine)
     with Session(engine) as session:
         seed_database(session, config)
     engine.dispose()
@@ -43,6 +51,7 @@ def set_password(email: str) -> None:
 
     engine = create_db_engine(get_config().database_url)
     Base.metadata.create_all(engine)
+    add_missing_columns(engine)
     with Session(engine) as session:
         email = email.strip().lower()
         admin = session.scalar(select(AdminUser).where(AdminUser.email == email))

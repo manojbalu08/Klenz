@@ -1,3 +1,4 @@
+import { orderTotal, rupees } from './format'
 import type { OrderCreated } from './types'
 
 export interface CustomerDetails {
@@ -20,21 +21,27 @@ export function whatsappLink(number: string, message: string): string {
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`
 }
 
-/** The order as a WhatsApp message. No prices: Klenz replies with a quote. */
+/** The placed order as the customer's WhatsApp message to Klenz. */
 export function orderMessage(order: OrderCreated, customer: CustomerDetails): string {
+  const paidNow = order.payment_method === 'now'
   return [
     '*New order — Klenz*',
     `Order: ${order.reference}`,
     '',
-    ...order.items.map(
-      (item) => `• ${item.quantity} × ${item.product_name}${item.product_spec ? ` — ${item.product_spec}` : ''}`,
-    ),
+    ...order.items.map((item) => {
+      const spec = item.product_spec ? ` — ${item.product_spec}` : ''
+      const price = item.unit_price > 0 ? rupees(item.line_total) : 'price on request'
+      return `• ${item.quantity} × ${item.product_name}${spec}: ${price}`
+    }),
+    '',
+    `*Total: ${orderTotal(order.total, order.price_pending)}*`,
+    `Payment: ${paidNow ? `Paid by UPI QR${order.payment_ref ? ` (ref ${order.payment_ref})` : ''}` : 'Pay later'}`,
     '',
     `Name: ${customer.name || '-'}`,
     `Phone: ${customer.phone || '-'}`,
     `Address: ${customer.address || '-'}`,
     ...(customer.note ? [`Note: ${customer.note}`] : []),
     '',
-    'Please send the price and delivery details.',
+    paidNow ? 'I have paid by UPI. Please confirm my order.' : 'Please confirm my order and the delivery.',
   ].join('\n')
 }

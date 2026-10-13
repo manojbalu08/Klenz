@@ -13,6 +13,10 @@ interface CartValue {
   items: CartItem[]
   /** Number of packs in the cart. */
   count: number
+  /** Rupees for the priced items. */
+  total: number
+  /** Some items have no price yet ("Price on request"). */
+  pricePending: boolean
   quantityOf: (productId: number) => number
   setQuantity: (productId: number, quantity: number) => void
   clear: () => void
@@ -60,6 +64,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return {
       items,
       count: items.reduce((sum, item) => sum + item.quantity, 0),
+      // In paise, so ₹0.10 + ₹0.20 adds up exactly.
+      total: items.reduce((sum, item) => sum + Math.round(item.product.price * 100) * item.quantity, 0) / 100,
+      pricePending: items.some((item) => item.product.price <= 0),
       quantityOf: (productId) => lines[productId] ?? 0,
       setQuantity,
       clear: () => setLines({}),

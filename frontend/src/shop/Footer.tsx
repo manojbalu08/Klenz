@@ -1,16 +1,19 @@
+import { Link } from 'react-router'
+import { MailIcon, PhoneIcon, WhatsAppIcon } from '../components/icons'
+import Logo from '../components/Logo'
+import { phoneNumbers } from '../lib/format'
 import { whatsappLink, whatsappNumber } from '../lib/whatsapp'
 import styles from './Footer.module.css'
 import { useSite } from './SiteDataContext'
 
 const YEAR = new Date().getFullYear()
 
-/** "+91 90873 12905, +91 73973 83403" -> one entry per number. */
-function phoneNumbers(text: string): string[] {
-  return text
-    .split(/[,/;]/)
-    .map((part) => part.trim())
-    .filter(Boolean)
-}
+const LINKS = [
+  { to: '/', label: 'Home' },
+  { to: '/#shop', label: 'Products' },
+  { to: '/about', label: 'About Us' },
+  { to: '/contact', label: 'Contact Us' },
+]
 
 export default function Footer() {
   const { settings, content } = useSite().data
@@ -19,33 +22,58 @@ export default function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={styles.inner}>
-        <div className={styles.top}>
+        <div className={styles.main}>
           <div className={styles.brand}>
-            <span className={styles.wordmark}>Klenz</span>
-            <span className={styles.tagline}>{content['site.footer_tagline']}</span>
+            <Link to="/" className={styles.brandLink} aria-label="Klenz home">
+              <Logo size={44} />
+              <span className={styles.wordmark}>Klenz</span>
+            </Link>
+            <p className={styles.tagline}>{content['site.footer_tagline']}</p>
           </div>
-          <div className={styles.reach}>
-            <span className={styles.reachTitle}>Reach us</span>
-            {settings.phone ? (
-              phoneNumbers(settings.phone).map((number) => (
-                <a key={number} href={`tel:${number.replace(/[^\d+]/g, '')}`}>
-                  {number}
-                </a>
-              ))
-            ) : (
-              <span>[Phone number]</span>
-            )}
-            {waNumber ? (
-              <a href={whatsappLink(waNumber, 'Hello Klenz!')} target="_blank" rel="noreferrer">
-                WhatsApp: {settings.whatsapp_number}
+
+          <nav className={styles.links} aria-label="Footer">
+            {LINKS.map((link) => (
+              <Link key={link.to} to={link.to}>
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className={styles.contact}>
+            {phoneNumbers(settings.phone).map((number) => (
+              <a key={number} className={styles.chip} href={`tel:${number.replace(/[^\d+]/g, '')}`}>
+                <PhoneIcon size={16} />
+                {number}
               </a>
-            ) : (
-              <span>[WhatsApp number]</span>
+            ))}
+            {waNumber && (
+              <a
+                className={`${styles.chip} ${styles.whatsapp}`}
+                href={whatsappLink(waNumber, 'Hello Klenz!')}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <WhatsAppIcon size={16} />
+                WhatsApp
+              </a>
             )}
-            {settings.email ? <a href={`mailto:${settings.email}`}>{settings.email}</a> : <span>[Email address]</span>}
+            {settings.email && (
+              <a className={styles.chip} href={`mailto:${settings.email}`}>
+                <MailIcon size={16} />
+                {settings.email}
+              </a>
+            )}
           </div>
         </div>
-        <div className={styles.bottom}>© {YEAR} Klenz. All rights reserved.</div>
+
+        <div className={styles.bottom}>
+          <span>
+            © {YEAR} Klenz{settings.address ? ` · ${settings.address}` : ''}. All rights reserved.
+          </span>
+          <button type="button" className={styles.toTop} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            Back to top ↑
+          </button>
+        </div>
       </div>
     </footer>
   )

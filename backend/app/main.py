@@ -12,7 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session, sessionmaker
 
 from .config import AppConfig, get_config
-from .database import Base, apply_mysql_table_options, create_db_engine, ensure_mysql_database
+from .database import Base, add_missing_columns, apply_mysql_table_options, create_db_engine, ensure_mysql_database
 from .ratelimit import RateLimiter
 from .routers import admin, auth, public
 from .security import resolve_secret_key
@@ -32,6 +32,8 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
             log.info("Created MySQL database %r.", engine.url.database)
         apply_mysql_table_options(engine)
         Base.metadata.create_all(engine)
+        if added := add_missing_columns(engine):
+            log.info("Added database columns: %s", ", ".join(added))
         with session_factory() as session:
             seed_database(session, config)
         yield

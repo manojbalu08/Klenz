@@ -2,6 +2,23 @@
 
 What was built and decided, in order, so the next round of changes can start from here. How-to guides: [README.md](README.md) (run it on your PC), [DEPLOY.md](DEPLOY.md) (hosting and updates), [CLAUDE.md](CLAUDE.md) (code map for developers and Claude Code).
 
+## 13 October 2026: checkout with UPI payment, prices and design round
+
+Requested after the first review:
+1. **Ordering and payment.** Checkout now happens in the cart popup: cart → details → payment. The customer either **pays now** by scanning a UPI QR for the exact total (with an optional UPI reference number) or **pays later**. Every order is saved in the database, shown in Admin → Enquiries with its total and payment, and sent to the admin's WhatsApp automatically (free CallMeBot service, set up in Admin → Settings). At the end the customer can also send the order from their own WhatsApp. Until a UPI ID is saved in Admin → Settings, the QR is a marked sample that pays nothing.
+2. **Prices are back**, as asked: a price per pack on product cards, in the cart, the WhatsApp messages and the admin. A product without a price shows "Price on request" (and can only be paid later). Admin can mark a payment as "Customer says paid" or "Paid".
+3. **Cart as a popup** instead of the side panel; full screen on phones. The Contact page is now a plain contact page (call, WhatsApp, email, map link).
+4. **Removed** the "Watch video" button and the announcement bar.
+5. **Same logo on every product:** the catalogue photos had an older "KLENZ + leaf" print; it was replaced by the real "Klenz" logo with the copper swoosh (navy letters on white packs, copper on the navy box). The fold tissues, which have no pack, got the round logo.
+6. **Video controls:** play/pause and full screen buttons (also click to pause, double-click for full screen).
+7. **"Your brand on every pack"** now uses the client's sharp product photos instead of blurry catalogue crops.
+8. **Footer** redesigned: about half the height, one row with logo, links and contact buttons.
+9. **Products section** has a soft brand-blue background; product photos sit on a light blue glow.
+
+Also: new database columns (prices, payment) are added automatically when the site starts, so the live database updates itself on deploy. Page text that mentioned the old WhatsApp-only ordering was updated (only where nobody had edited it).
+
+Checks: 36 backend tests (SQLite, MySQL 5.0 on this PC, MySQL 8.4 in GitHub Actions); browser test of the whole checkout, payment QR, WhatsApp message, admin payment marking, videos and full screen; no sideways scrolling from phone to 4K TV.
+
 ## 12–13 October 2026: first version, live for the client's review
 
 ### Built from the design
@@ -16,7 +33,7 @@ What was built and decided, in order, so the next round of changes can start fro
 
 ### Catalogue round (client feedback)
 - Only the 10 products in the catalogue (`Images/products.jpeg`), each with its pack size.
-- No prices anywhere: customers send the order on WhatsApp and Klenz replies with a quote.
+- No prices at the time: customers sent the order on WhatsApp and Klenz replied with a quote (prices came back on 13 October).
 - One colour theme ("Ocean" blue); the theme switcher was removed.
 - Product videos made from the client's photos: facial tissue, tissue napkins, rolls and folds, and a loop in the home page hero.
 - Livelier home page: moving highlights strip, sections that fade in on scroll, "Ideal for" and "Your brand on every pack" sections.
@@ -30,13 +47,9 @@ What was built and decided, in order, so the next round of changes can start fro
 - Live for review at **https://klenz-tissue.onrender.com** since 13 October.
 - Free-plan limit: the site sleeps after 15 minutes without visitors and takes about a minute to wake.
 
-### Checks
-- 28 backend tests pass on SQLite and on MySQL 8.4 set up as strictly as Aiven (encrypted connections only).
-- The production build looks exactly like the version the client reviewed at phone, tablet and desktop widths.
-- Live site checked: pages, the 10 products, videos, admin login page and the database connection.
-
-### Open items
-- Add the GitHub secret `RENDER_DEPLOY_HOOK_URL` and the variable `SITE_URL` ([DEPLOY.md](DEPLOY.md), step 3) so every push deploys by itself.
-- From the client: PIN code (642001 on the visiting card or 642002 in the catalogue), About Us text, opening hours, their own photos and videos, and the WhatsApp number for orders.
+## Open items
+- Add the GitHub secret `RENDER_DEPLOY_HOOK_URL` and the variable `SITE_URL` ([DEPLOY.md](DEPLOY.md), step 3) so every push deploys by itself; until then use Render → **Manual Deploy**.
+- In the live admin: the price of each product, the real UPI ID (replaces the sample QR) and the WhatsApp order alerts ([DEPLOY.md](DEPLOY.md), step 4).
+- From the client: prices, UPI ID, PIN code (642001 on the visiting card or 642002 in the catalogue), About Us text, opening hours, their own photos and videos, and the WhatsApp number for orders.
 - Before announcing the site: change the admin password if it was shared, and delete the sample and test enquiries.
 - Optional: the client's own domain. `klenztissue.com` and `klenztissue.in` were free on 13 October; `klenz.com`, `klenz.in` and `pollachi.com` are taken.

@@ -55,7 +55,25 @@
 }
 
 .itemsTable {
-  min-width: 420px;
+  min-width: 520px;
+}
+
+/* How the customer pays, and the buttons to record the payment. */
+.payment {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  padding: 16px 20px;
+  border-radius: 18px;
+  border: 1.5px solid var(--a-line);
+}
+
+.paymentText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .itemsTable tfoot td {

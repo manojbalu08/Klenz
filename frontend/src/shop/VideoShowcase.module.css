@@ -101,7 +101,52 @@
   color: var(--ink);
 }
 
+/* Play / pause, progress and full screen along the bottom of the video. */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.control {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.control:hover {
+  transform: scale(1.08);
+  background: #fff;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+/* Full screen: the whole video shows, letterboxed, with square corners. */
+.main[data-fullscreen] {
+  border-radius: 0;
+  aspect-ratio: auto;
+  background: #000;
+}
+
+.main[data-fullscreen] .fill {
+  object-fit: contain;
+}
+
 .track {
+  flex: 1 1 auto;
   height: 8px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.55);

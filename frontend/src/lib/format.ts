@@ -5,6 +5,28 @@ export function dateTime(iso: string): string {
   return dateTimeFormat.format(new Date(iso))
 }
 
+const wholeRupees = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })
+const rupeesAndPaise = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2 })
+
+/** ₹1,25,000 or ₹240.50 (paise only when there are some). Same as rupees() in backend/app/notify.py. */
+export function rupees(amount: number): string {
+  return (Number.isInteger(Math.round(amount * 100) / 100) ? wholeRupees : rupeesAndPaise).format(amount)
+}
+
+/** An order or cart total: "₹1,490", "₹1,490 + items on request", or "On request" when nothing has a price. */
+export function orderTotal(total: number, pricePending: boolean): string {
+  if (total <= 0 && pricePending) return 'On request'
+  return pricePending ? `${rupees(total)} + items on request` : rupees(total)
+}
+
+/** "+91 90873 12905, +91 73973 83403" -> one entry per number. */
+export function phoneNumbers(text: string): string[] {
+  return text
+    .split(/[,/;]/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+}
+
 export function packs(count: number): string {
   return `${count} ${count === 1 ? 'pack' : 'packs'}`
 }

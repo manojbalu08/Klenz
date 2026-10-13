@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router'
-import { CheckIcon, IdealIcon, PlayIcon } from '../components/icons'
+import { CheckIcon, IdealIcon } from '../components/icons'
 import { Reveal, useReducedMotion } from '../components/motion'
 import { lines } from '../lib/format'
 import type { Product } from '../lib/types'
@@ -37,12 +37,6 @@ export default function HomePage() {
               <a href="#shop" className={`${ui.button} ${ui.primary} ${ui.large} ${styles.shine}`}>
                 Order now
               </a>
-              {videos.length > 0 && (
-                <a href="#videos" className={`${ui.button} ${ui.outline} ${ui.large} ${styles.watch}`}>
-                  <PlayIcon />
-                  Watch video
-                </a>
-              )}
             </div>
           </div>
           <div className={styles.heroArtColumn}>
@@ -53,8 +47,10 @@ export default function HomePage() {
 
       {highlights.length > 0 && <Highlights items={highlights} />}
 
-      <section id="shop" className={`${ui.section} ${styles.anchor}`}>
-        <div className={`${ui.container} ${ui.stack}`}>
+      <section id="shop" className={`${ui.section} ${styles.anchor} ${styles.shop}`}>
+        <span className={`${ui.circle} ${styles.shopGlowA}`} aria-hidden="true" />
+        <span className={`${ui.circle} ${styles.shopGlowB}`} aria-hidden="true" />
+        <div className={`${ui.container} ${ui.stack} ${styles.shopInner}`}>
           <ProductGrid
             products={products}
             eyebrow={c['home.shop_eyebrow']}
@@ -115,9 +111,9 @@ export default function HomePage() {
             <h2 className={`${ui.display} ${styles.bulkTitle}`}>{c['home.bulk_title']}</h2>
             <p>{c['home.bulk_text']}</p>
           </div>
-          <Link to="/contact" className={`${ui.button} ${ui.accent} ${ui.large}`}>
-            Go to Contact
-          </Link>
+          <a href="#shop" className={`${ui.button} ${ui.accent} ${ui.large}`}>
+            Start your order
+          </a>
         </Reveal>
       </section>
     </>
@@ -296,14 +292,18 @@ function Branding({ eyebrow, title, text, points }: BrandingProps) {
           <span className={`${ui.circle} ${styles.brandingGlow}`} aria-hidden="true" />
           <img
             className={styles.brandingBox}
-            src="/images/catalogue/box-printing.jpg"
-            alt="Klenz facial tissue box with custom printing"
+            src="/images/catalogue/branding-box.jpg"
+            alt="Klenz facial tissue box printed with the Klenz logo"
+            width={900}
+            height={660}
             loading="lazy"
           />
           <img
             className={styles.brandingCover}
-            src="/images/catalogue/pp-cover.jpg"
-            alt="Klenz tissue packs in PP covers of different colours"
+            src="/images/catalogue/branding-napkins.jpg"
+            alt="Klenz premium napkins in a printed pack"
+            width={900}
+            height={660}
             loading="lazy"
           />
         </Reveal>

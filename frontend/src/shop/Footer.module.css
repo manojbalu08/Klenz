@@ -1,8 +1,22 @@
+/* Compact footer: brand, links and contact chips in one row; copyright underneath. */
 .footer {
   --focus: var(--accent);
-  padding: 56px clamp(20px, 5vw, 64px) 32px;
-  background: var(--ink);
+  position: relative;
+  padding: 30px clamp(20px, 5vw, 64px) 18px;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(34, 211, 238, 0.18), transparent 38%),
+    radial-gradient(circle at 96% 100%, rgba(29, 95, 224, 0.35), transparent 42%),
+    var(--ink);
   color: #fff;
+}
+
+/* Brand gradient along the top edge. */
+.footer::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
 }
 
 .inner {
@@ -10,57 +24,144 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 22px;
 }
 
-.top {
+.main {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: 32px;
+  gap: 20px 40px;
 }
 
 .brand {
   flex: 1 1 280px;
   display: flex;
   flex-direction: column;
+  gap: 8px;
+}
+
+.brandLink {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
   gap: 12px;
+  color: #fff;
+  text-decoration: none;
 }
 
 .wordmark {
   font-family: 'Bricolage Grotesque', sans-serif;
   font-weight: 700;
-  font-size: 30px;
+  font-size: 26px;
 }
 
 .tagline {
-  max-width: 320px;
-  font-size: 16px;
-  line-height: 1.6;
+  max-width: 380px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
   color: var(--on-ink-muted);
 }
 
-.reach {
+.links {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 16px;
-  color: var(--on-ink-muted);
+  flex-wrap: wrap;
+  gap: 6px 22px;
 }
 
-.reach a {
-  color: inherit;
-}
-
-.reachTitle {
-  margin-bottom: 6px;
-  font-weight: 700;
+.links a {
   color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.links a:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.contact {
+  flex: 1 1 320px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.chip:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-2px);
+}
+
+.whatsapp {
+  background: #25d366;
+  border-color: #25d366;
+  color: #063b1b;
+  font-weight: 700;
+}
+
+.whatsapp:hover {
+  background: #2ee676;
 }
 
 .bottom {
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 20px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 13px;
   color: var(--on-ink-muted);
+}
+
+.toTop {
+  min-height: 32px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--on-ink-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toTop:hover {
+  color: #fff;
+}
+
+@media (max-width: 760px) {
+  /* Room under the copyright line for the floating "View cart" button. */
+  .footer {
+    padding-bottom: 88px;
+  }
+
+  .contact {
+    justify-content: flex-start;
+  }
 }

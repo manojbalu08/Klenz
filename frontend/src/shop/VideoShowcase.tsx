@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { PauseIcon, PlayIcon } from '../components/icons'
+import { ExitFullscreenIcon, FullscreenIcon, PauseIcon, PlayIcon } from '../components/icons'
 import { useInView, useReducedMotion } from '../components/motion'
 import { videoSource } from '../lib/video'
 import type { Video } from '../lib/types'
@@ -72,6 +72,29 @@ export default function VideoShowcase({ videos }: { videos: Video[] }) {
 
 type PlayerState = 'idle' | 'playing' | 'paused' | 'coming-soon' | 'error'
 
+// Older Safari only has the prefixed full screen API; iPhones only let the <video> itself go full screen.
+type WebkitDocument = Document & { webkitFullscreenElement?: Element | null; webkitExitFullscreen?: () => void }
+type WebkitElement = HTMLElement & { webkitRequestFullscreen?: () => void }
+type WebkitVideo = HTMLVideoElement & { webkitEnterFullscreen?: () => void }
+
+function fullscreenElement(): Element | null {
+  return document.fullscreenElement ?? (document as WebkitDocument).webkitFullscreenElement ?? null
+}
+
+function toggleFullscreen(container: HTMLElement | null, video: HTMLVideoElement | null) {
+  const doc = document as WebkitDocument
+  if (fullscreenElement()) {
+    if (document.exitFullscreen) void document.exitFullscreen().catch(() => undefined)
+    else doc.webkitExitFullscreen?.()
+  } else if (container?.requestFullscreen) {
+    void container.requestFullscreen().catch(() => undefined)
+  } else if ((container as WebkitElement | null)?.webkitRequestFullscreen) {
+    ;(container as WebkitElement).webkitRequestFullscreen?.()
+  } else {
+    ;(video as WebkitVideo | null)?.webkitEnterFullscreen?.()
+  }
+}
+
 interface MainPlayerProps {
   video: Video
   /** Play silently while the section is on screen. */
@@ -84,7 +107,19 @@ function MainPlayer({ video, autoPlay, onEnded }: MainPlayerProps) {
   const [state, setState] = useState<PlayerState>('idle')
   const [pausedByVisitor, setPausedByVisitor] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [fullscreen, setFullscreen] = useState(false)
+  const mainRef = useRef<HTMLDivElement>(null)
   const fileRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const onChange = () => setFullscreen(fullscreenElement() === mainRef.current)
+    document.addEventListener('fullscreenchange', onChange)
+    document.addEventListener('webkitfullscreenchange', onChange)
+    return () => {
+      document.removeEventListener('fullscreenchange', onChange)
+      document.removeEventListener('webkitfullscreenchange', onChange)
+    }
+  }, [])
 
   useEffect(() => {
     const player = fileRef.current
@@ -142,12 +177,18 @@ function MainPlayer({ video, autoPlay, onEnded }: MainPlayerProps) {
   }[state]
 
   return (
-    <div className={`${styles.main} ${hasPicture ? styles.withPicture : ''}`}>
+    <div
+      ref={mainRef}
+      className={`${styles.main} ${hasPicture ? styles.withPicture : ''}`}
+      data-fullscreen={fullscreen || undefined}
+    >
       {source.kind === 'youtube' && <img className={styles.fill} src={source.thumbnail} alt="" />}
       {source.kind === 'file' && (
         <video
           ref={fileRef}
-          className={styles.fill}
+          className={`${styles.fill} ${styles.clickable}`}
+          onClick={togglePlay}
+          onDoubleClick={() => toggleFullscreen(mainRef.current, fileRef.current)}
           src={source.poster ? source.src : `${source.src}#t=0.1`}
           poster={source.poster}
           muted
@@ -185,8 +226,30 @@ function MainPlayer({ video, autoPlay, onEnded }: MainPlayerProps) {
         <span className={styles.captionTitle} aria-live="polite">
           {caption}
         </span>
-        <div className={styles.track}>
-          <div className={styles.progress} style={{ width: `${progress}%` }} />
+        <div className={styles.controls}>
+          {source.kind === 'file' && (
+            <button
+              type="button"
+              className={styles.control}
+              aria-label={playing ? 'Pause video' : 'Play video'}
+              onClick={togglePlay}
+            >
+              {playing ? <PauseIcon size={18} /> : <PlayIcon size={18} />}
+            </button>
+          )}
+          <div className={styles.track}>
+            <div className={styles.progress} style={{ width: `${progress}%` }} />
+          </div>
+          {source.kind === 'file' && (
+            <button
+              type="button"
+              className={styles.control}
+              aria-label={fullscreen ? 'Exit full screen' : 'Watch full screen'}
+              onClick={() => toggleFullscreen(mainRef.current, fileRef.current)}
+            >
+              {fullscreen ? <ExitFullscreenIcon /> : <FullscreenIcon />}
+            </button>
+          )}
         </div>
       </div>
     </div>

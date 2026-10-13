@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
-import type { OrderStatus } from '../lib/types'
+import type { Order, OrderStatus } from '../lib/types'
 import ui from './admin.module.css'
 import { useAuth } from './AuthContext'
 
@@ -29,7 +29,7 @@ export function PageHeader({ title, subtitle }: { title: string; subtitle: strin
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
   new: 'New',
-  quoted: 'Quote sent',
+  quoted: 'Confirmed',
   closed: 'Closed',
 }
 
@@ -39,6 +39,23 @@ export function StatusPill({ status }: { status: OrderStatus }) {
   return (
     <span className={ui.pill} data-tone={STATUS_TONES[status]}>
       {STATUS_LABELS[status] ?? status}
+    </span>
+  )
+}
+
+/** "Paid", "UPI · to check" (the customer says they paid by QR) or "Pay later". */
+export function PaymentPill({ order }: { order: Pick<Order, 'payment_method' | 'payment_status'> }) {
+  const [label, tone] =
+    order.payment_status === 'paid'
+      ? ['Paid', 'green']
+      : order.payment_status === 'reported'
+        ? ['UPI · to check', 'blue']
+        : order.payment_method === 'later'
+          ? ['Pay later', 'warm']
+          : ['Not paid', 'warm']
+  return (
+    <span className={ui.pill} data-tone={tone}>
+      {label}
     </span>
   )
 }

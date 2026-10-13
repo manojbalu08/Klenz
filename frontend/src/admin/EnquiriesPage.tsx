@@ -3,12 +3,18 @@ import { useSearchParams } from 'react-router'
 import Dialog from '../components/Dialog'
 import { WhatsAppIcon } from '../components/icons'
 import { api } from '../lib/api'
-import { dateTime, packs, timeAgo } from '../lib/format'
-import type { Order, OrderList, OrderStatus } from '../lib/types'
+import { dateTime, orderTotal, packs, rupees, timeAgo } from '../lib/format'
+import type { Order, OrderList, OrderStatus, PaymentStatus } from '../lib/types'
 import { whatsappLink, whatsappNumber } from '../lib/whatsapp'
 import ui from './admin.module.css'
 import styles from './EnquiriesPage.module.css'
-import { ErrorNotice, PageHeader, STATUS_LABELS, StatusPill, useLoad } from './shared'
+import { ErrorNotice, PageHeader, PaymentPill, STATUS_LABELS, StatusPill, useLoad } from './shared'
+
+const PAYMENT_BUTTONS: { id: PaymentStatus; label: string }[] = [
+  { id: 'pending', label: 'Not paid' },
+  { id: 'reported', label: 'Customer says paid' },
+  { id: 'paid', label: 'Paid (checked)' },
+]
 
 const FILTERS: { id: OrderStatus | 'all'; label: string }[] = [
   { id: 'all', label: 'All' },
@@ -54,7 +60,7 @@ export default function EnquiriesPage() {
 
   return (
     <>
-      <PageHeader title="Enquiries" subtitle="Orders and quote requests sent from the website." />
+      <PageHeader title="Enquiries" subtitle="Orders placed on the website, with their payment." />
       <ErrorNotice>{error}</ErrorNotice>
 
       <section className={ui.card}>
@@ -93,7 +99,8 @@ export default function EnquiriesPage() {
                   <th>Order</th>
                   <th>Customer</th>
                   <th>Items</th>
-                  <th>Packs</th>
+                  <th>Total</th>
+                  <th>Payment</th>
                   <th>Status</th>
                   <th>
                     <span className="sr-only">Details</span>
@@ -112,7 +119,15 @@ export default function EnquiriesPage() {
                       <span className={ui.sub}>{order.phone}</span>
                     </td>
                     <td className={styles.items}>{order.summary}</td>
-                    <td className={`${ui.strong} ${ui.nowrap}`}>{packs(order.item_count)}</td>
+                    <td className={ui.nowrap}>
+                      <span className={ui.strong}>
+                        {order.total > 0 ? `${rupees(order.total)}${order.price_pending ? ' +' : ''}` : 'On request'}
+                      </span>
+                      <span className={ui.sub}>{packs(order.item_count)}</span>
+                    </td>
+                    <td>
+                      <PaymentPill order={order} />
+                    </td>
                     <td>
                       <StatusPill status={order.status} />
                     </td>
@@ -163,14 +178,14 @@ function EnquiryDialog({ order, countryCode, onClose, onChanged, onDeleted }: En
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function setStatus(status: OrderStatus) {
+  async function update(changes: { status?: OrderStatus; payment_status?: PaymentStatus }) {
     setBusy(true)
     setError(null)
     try {
-      await api.updateOrderStatus(order.id, status)
+      await api.updateOrder(order.id, changes)
       onChanged()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not update the status.')
+      setError(err instanceof Error ? err.message : 'Could not update the order.')
     } finally {
       setBusy(false)
     }
@@ -188,9 +203,11 @@ function EnquiryDialog({ order, countryCode, onClose, onChanged, onDeleted }: En
     }
   }
 
+  const total = orderTotal(order.total, order.price_pending)
   const replyLink = whatsappLink(
     whatsappNumber(order.phone, countryCode),
-    `Hi ${order.customer_name}, thank you for your Klenz order ${order.reference}. Here is your quote: `,
+    `Hi ${order.customer_name}, thank you for your Klenz order ${order.reference} (total ${total}). ` +
+      (order.payment_status === 'paid' ? 'We have received your payment. ' : ''),
   )
 
   return (
@@ -216,11 +233,37 @@ function EnquiryDialog({ order, countryCode, onClose, onChanged, onDeleted }: En
               className={ui.tab}
               aria-pressed={order.status === status}
               disabled={busy}
-              onClick={() => setStatus(status)}
+              onClick={() => update({ status })}
             >
               {STATUS_LABELS[status]}
             </button>
           ))}
+        </div>
+
+        <div className={styles.payment}>
+          <div className={styles.paymentText}>
+            <span className={ui.strong}>
+              {order.payment_method === 'now' ? 'Paid with the UPI QR at checkout' : 'Pay later (cash or UPI on delivery)'}
+            </span>
+            <span className={ui.muted}>
+              {order.payment_ref ? `UPI reference: ${order.payment_ref}` : order.payment_method === 'now' ? 'No UPI reference given.' : ''}
+              {order.payment_status === 'reported' ? ' Check your bank, then mark it paid.' : ''}
+            </span>
+          </div>
+          <div className={ui.tabs} role="group" aria-label="Payment">
+            {PAYMENT_BUTTONS.map((button) => (
+              <button
+                key={button.id}
+                type="button"
+                className={ui.tab}
+                aria-pressed={order.payment_status === button.id}
+                disabled={busy}
+                onClick={() => update({ payment_status: button.id })}
+              >
+                {button.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <dl className={styles.details}>
@@ -247,6 +290,8 @@ function EnquiryDialog({ order, countryCode, onClose, onChanged, onDeleted }: En
                 <th>Product</th>
                 <th>Pack size</th>
                 <th>Qty</th>
+                <th>Price</th>
+                <th>Amount</th>
               </tr>
             </thead>
             <tbody>
@@ -255,6 +300,8 @@ function EnquiryDialog({ order, countryCode, onClose, onChanged, onDeleted }: En
                   <td className={ui.strong}>{item.product_name}</td>
                   <td className={ui.muted}>{item.product_spec || '—'}</td>
                   <td>{item.quantity}</td>
+                  <td className={ui.nowrap}>{item.unit_price > 0 ? rupees(item.unit_price) : 'On request'}</td>
+                  <td className={ui.nowrap}>{item.unit_price > 0 ? rupees(item.line_total) : '—'}</td>
                 </tr>
               ))}
             </tbody>
@@ -262,6 +309,9 @@ function EnquiryDialog({ order, countryCode, onClose, onChanged, onDeleted }: En
               <tr>
                 <td colSpan={2}>Total</td>
                 <td className={ui.nowrap}>{packs(order.item_count)}</td>
+                <td colSpan={2} className={ui.nowrap}>
+                  {total}
+                </td>
               </tr>
             </tfoot>
           </table>

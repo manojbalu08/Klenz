@@ -3,14 +3,20 @@
 export type ArtStyle = 'box' | 'pocket' | 'roll' | 'towel' | 'napkin'
 export type Tint = 'soft' | 'soft2'
 export type OrderStatus = 'new' | 'quoted' | 'closed'
+/** "now": paid with the UPI QR at checkout; "later": pays on delivery or later. */
+export type PaymentMethod = 'now' | 'later'
+/** reported = the customer says they paid; paid = the admin checked the bank. */
+export type PaymentStatus = 'pending' | 'reported' | 'paid'
 
 export interface Product {
   id: number
   name: string
   category: string
   description: string
-  /** Pack size shown instead of a price, e.g. "80 grams". */
+  /** Pack size, e.g. "80 grams". */
   spec: string
+  /** Rupees per pack; 0 means "Price on request". */
+  price: number
   art: ArtStyle
   tint: Tint
   image_url: string
@@ -40,6 +46,15 @@ export interface SiteSettings {
   address: string
   hours: string
   country_code: string
+  /** Empty shows a sample payment QR. */
+  upi_id: string
+  upi_name: string
+}
+
+/** WhatsApp alerts to the admin for new orders (CallMeBot); the key itself is never sent back. */
+export interface OrderAlerts {
+  phone: string
+  apikey_set: boolean
 }
 
 export type Content = Record<string, string>
@@ -56,6 +71,9 @@ export interface OrderItem {
   product_name: string
   product_spec: string
   quantity: number
+  /** Price per pack when ordered; 0 = price on request. */
+  unit_price: number
+  line_total: number
 }
 
 export interface OrderCreated {
@@ -64,6 +82,14 @@ export interface OrderCreated {
   items: OrderItem[]
   /** Number of packs. */
   item_count: number
+  /** Sum of the priced items. */
+  total: number
+  /** Some items had no price, so Klenz confirms the final total. */
+  price_pending: boolean
+  payment_method: PaymentMethod
+  payment_status: PaymentStatus
+  /** UPI transaction reference the customer typed in. */
+  payment_ref: string
 }
 
 export interface Order extends OrderCreated {
@@ -83,6 +109,8 @@ export interface OrderInput {
   address: string
   note: string
   items: { product_id: number; quantity: number }[]
+  payment_method: PaymentMethod
+  payment_ref: string
 }
 
 export interface OrderList {

@@ -1,4 +1,5 @@
 import { revealClass, revealDelay, useInView } from '../components/motion'
+import { rupees } from '../lib/format'
 import type { Product } from '../lib/types'
 import { useCart } from './CartContext'
 import ProductArt, { tintColor } from './ProductArt'
@@ -13,7 +14,10 @@ export default function ProductCard({ product, index = 0 }: { product: Product; 
 
   return (
     <article ref={ref} className={`${styles.card} ${revealClass(shown)}`} style={revealDelay((index % 4) * 90)}>
-      <div className={styles.picture} style={{ background: product.image_url ? '#fff' : tintColor(product.tint) }}>
+      <div
+        className={`${styles.picture} ${product.image_url ? styles.withPhoto : ''}`}
+        style={product.image_url ? undefined : { background: tintColor(product.tint) }}
+      >
         {product.image_url ? (
           <img className={styles.photo} src={product.image_url} alt={product.name} loading="lazy" />
         ) : (
@@ -24,6 +28,14 @@ export default function ProductCard({ product, index = 0 }: { product: Product; 
       <div className={styles.body}>
         <h3 className={styles.name}>{product.name}</h3>
         <p className={styles.description}>{product.description}</p>
+        {product.price > 0 ? (
+          <p className={styles.price}>
+            {rupees(product.price)}
+            <span className={styles.per}> / pack</span>
+          </p>
+        ) : (
+          <p className={`${styles.price} ${styles.onRequest}`}>Price on request</p>
+        )}
         <div className={styles.buy}>
           {product.spec && <span className={styles.spec}>{product.spec}</span>}
           {quantity > 0 ? (

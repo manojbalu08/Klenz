@@ -53,7 +53,7 @@ PAGES: tuple[ContentPage, ...] = (
             ContentField(
                 "home.intro",
                 "Intro text",
-                "Pick your tissue, add it to the cart and send your order on WhatsApp. "
+                "Pick your tissue, add it to the cart and order in a minute. Pay now by UPI or pay later. "
                 "Fresh stock for homes, shops, cafés and hotels.",
                 "textarea",
             ),
@@ -61,7 +61,7 @@ PAGES: tuple[ContentPage, ...] = (
                 "home.highlights",
                 "Highlights strip",
                 "Soft & safe\nHigh absorbency\nPremium quality\nCustom branding available\nPan India delivery\n"
-                "Order on WhatsApp",
+                "Pay by UPI or later",
                 "textarea",
                 "One highlight per line.",
             ),
@@ -70,7 +70,7 @@ PAGES: tuple[ContentPage, ...] = (
             ContentField(
                 "home.shop_note",
                 "Products — note",
-                "Choose your products and quantities — we reply on WhatsApp with prices and delivery.",
+                "Choose your products and quantities, then place your order. Pay now by UPI or pay later.",
             ),
             ContentField("home.ideal_eyebrow", "Ideal for — small label", "IDEAL FOR"),
             ContentField("home.ideal_title", "Ideal for — title", "Made for homes and businesses"),
@@ -88,12 +88,14 @@ PAGES: tuple[ContentPage, ...] = (
             ContentField("home.steps_title", "Steps — title", "Ordering takes 3 steps"),
             ContentField("home.step1_title", "Step 1 — title", "Add to cart"),
             ContentField("home.step1_text", "Step 1 — text", "Choose your products and quantities above."),
-            ContentField("home.step2_title", "Step 2 — title", "Send on WhatsApp"),
+            ContentField("home.step2_title", "Step 2 — title", "Place your order"),
             ContentField(
-                "home.step2_text", "Step 2 — text", "Your cart is filled into a WhatsApp message with your details."
+                "home.step2_text", "Step 2 — text", "Add your details, then pay with the UPI QR or choose to pay later."
             ),
             ContentField("home.step3_title", "Step 3 — title", "We confirm & deliver"),
-            ContentField("home.step3_text", "Step 3 — text", "We reply with the final price and delivery time."),
+            ContentField(
+                "home.step3_text", "Step 3 — text", "We confirm your order on WhatsApp and deliver to your door."
+            ),
             ContentField("home.branding_eyebrow", "Branding — small label", "PACKAGING & PRINTING"),
             ContentField("home.branding_title", "Branding — title", "Your brand on every pack"),
             ContentField(
@@ -114,7 +116,7 @@ PAGES: tuple[ContentPage, ...] = (
             ContentField(
                 "home.bulk_text",
                 "Bulk banner — text",
-                "Add your items, then tell us your quantity on the Contact page.",
+                "Add your items to the cart and place your order. We confirm bulk orders and delivery on WhatsApp.",
             ),
         ),
     ),
@@ -171,13 +173,13 @@ PAGES: tuple[ContentPage, ...] = (
         "contact",
         "Contact Us",
         (
-            ContentField("contact.badge", "Badge above the headline", "CONTACT & CHECKOUT"),
-            ContentField("contact.headline", "Headline", "Almost there — send your order", help=HEADLINE_HELP),
+            ContentField("contact.badge", "Badge above the headline", "CONTACT US"),
+            ContentField("contact.headline", "Headline", "Talk to the *Klenz* team", help=HEADLINE_HELP),
             ContentField(
                 "contact.intro",
                 "Intro text",
-                "Check your items, add your details and send the order on WhatsApp. "
-                "We'll confirm the final price and delivery.",
+                "Call or WhatsApp us for bulk orders, custom branding and delivery. "
+                "To order, add products to your cart and place the order.",
                 "textarea",
             ),
         ),
@@ -186,11 +188,6 @@ PAGES: tuple[ContentPage, ...] = (
         "site",
         "Header & footer",
         (
-            ContentField(
-                "site.announcement",
-                "Announcement bar",
-                "Order online in minutes — we confirm every order on WhatsApp",
-            ),
             ContentField(
                 "site.footer_tagline",
                 "Footer tagline",
@@ -202,5 +199,29 @@ PAGES: tuple[ContentPage, ...] = (
 )
 
 FIELDS: dict[str, ContentField] = {field.key: field for page in PAGES for field in page.fields}
+
+# Earlier default texts. On start-up a stored value that still equals one of these (nobody edited it)
+# is replaced by the current default, so wording changes reach existing databases too.
+PREVIOUS_DEFAULTS: dict[str, tuple[str, ...]] = {
+    "home.intro": (
+        "Pick your tissue, add it to the cart and send your order on WhatsApp. "
+        "Fresh stock for homes, shops, cafés and hotels.",
+    ),
+    "home.highlights": (
+        "Soft & safe\nHigh absorbency\nPremium quality\nCustom branding available\nPan India delivery\n"
+        "Order on WhatsApp",
+    ),
+    "home.shop_note": ("Choose your products and quantities — we reply on WhatsApp with prices and delivery.",),
+    "home.step2_title": ("Send on WhatsApp",),
+    "home.step2_text": ("Your cart is filled into a WhatsApp message with your details.",),
+    "home.step3_text": ("We reply with the final price and delivery time.",),
+    "home.bulk_text": ("Add your items, then tell us your quantity on the Contact page.",),
+    "contact.badge": ("CONTACT & CHECKOUT",),
+    "contact.headline": ("Almost there — send your order",),
+    "contact.intro": (
+        "Check your items, add your details and send the order on WhatsApp. "
+        "We'll confirm the final price and delivery.",
+    ),
+}
 DEFAULTS: dict[str, str] = {key: field.default for key, field in FIELDS.items()}
 PUBLISHED_PAGE_COUNT = sum(1 for page in PAGES if page.is_page)

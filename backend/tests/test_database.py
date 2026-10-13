@@ -1,7 +1,32 @@
 import pytest
+from sqlalchemy import text
 
 from app.config import AppConfig
-from app.database import create_db_engine, parse_db_url
+from app.database import Base, add_missing_columns, create_db_engine, ensure_mysql_database, parse_db_url
+
+from .conftest import TEST_DATABASE_URL
+
+
+def test_columns_added_later_reach_existing_tables() -> None:
+    ensure_mysql_database(TEST_DATABASE_URL)
+    engine = create_db_engine(TEST_DATABASE_URL)
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+    with engine.begin() as conn:  # a database from before prices and payments
+        conn.execute(text(
+            "INSERT INTO products (name, category, description, spec, art, tint, image_url, is_live, sort_order,"
+            " created_at, updated_at) VALUES ('Toilet Roll', 'Rolls', '', '', 'roll', 'soft', '', 1, 0,"
+            " '2026-10-01 00:00:00', '2026-10-01 00:00:00')"
+        ))
+        conn.execute(text("ALTER TABLE products DROP COLUMN price"))
+        conn.execute(text("ALTER TABLE orders DROP COLUMN payment_status"))
+
+    assert sorted(add_missing_columns(engine)) == ["orders.payment_status", "products.price"]
+    assert add_missing_columns(engine) == []
+    with engine.connect() as conn:
+        assert conn.execute(text("SELECT price FROM products")).scalar_one() == 0
+    Base.metadata.drop_all(engine)
+    engine.dispose()
 
 
 def test_plain_mysql_link_uses_pymysql() -> None:

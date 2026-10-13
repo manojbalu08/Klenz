@@ -1,12 +1,14 @@
 """Cut the product pictures out of the Klenz catalogue (Images/products.jpeg, 1024 x 1536).
 
 Run from klenz-website/:  python tools/crop_catalogue.py
-Writes frontend/public/images/products/<slug>.jpg (product cards) and
-frontend/public/images/catalogue/ (packaging pictures and the range photo).
+Writes frontend/public/images/products/<slug>.jpg (product cards) with the real Klenz logo in place of
+the catalogue's old "KLENZ + leaf" print (see brand_logo.py), and the range photo for the About page.
 """
 from pathlib import Path
 
 from PIL import Image, ImageFilter
+
+from brand_logo import add_badge, erase, rebrand
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "Images" / "products.jpeg"
@@ -26,11 +28,19 @@ PRODUCTS = {
     "kitchen-roll": (385, 1001, 615, 1114),
     "hrt-roll": (660, 966, 872, 1124),
 }
-# Packaging & printing pictures (Home page branding section) and the banner photo (About page).
-EXTRAS = {
-    "pp-cover": (36, 1186, 290, 1266),
-    "box-printing": (498, 1158, 684, 1279),
+# Plain tissue stacks have no printed pack: they get the round logo in a corner instead.
+NO_PACK = {"m-fold-tissue", "l-fold-tissue"}
+# The navy box prints its logo in gold; search only the middle so its gold stripes are left alone.
+DARK_PACKS = {"facial-tissue-box": (0.44, 0.74)}
+# Where to look for the old print, as fractions of the photo width (default 0.22 to 0.78).
+COLUMNS = {"kitchen-roll": (0.12, 0.6)}
+# Bits of the old print on other faces (too small or too slanted for a new logo): painted over.
+# slug: [(box in the 640 x 440 picture, blend top-to-bottom instead of left-to-right)]
+COVER_UP = {
+    "facial-tissue-box": [((86, 212, 138, 290), True)],  # "KLENZ" on the side face
+    "toilet-roll": [((116, 122, 156, 214), False)],  # the print wrapping round the left edge
 }
+# Range photo for the About page.
 BANNER = (395, 0, 1024, 405)
 
 CANVAS = (640, 440)  # same shape as the product card picture (about 1.45 : 1)
@@ -57,9 +67,18 @@ def save(image: Image.Image, path: Path) -> None:
 
 catalogue = Image.open(SOURCE).convert("RGB")
 for slug, box in PRODUCTS.items():
-    save(on_canvas(catalogue.crop(box)), PRODUCTS_OUT / f"{slug}.jpg")
-for slug, box in EXTRAS.items():
-    save(on_canvas(catalogue.crop(box)), EXTRA_OUT / f"{slug}.jpg")
+    photo = on_canvas(catalogue.crop(box))
+    if slug in NO_PACK:
+        add_badge(photo)
+    elif slug in DARK_PACKS:
+        found = rebrand(photo, dark=True, columns=DARK_PACKS[slug])
+    else:
+        found = rebrand(photo, columns=COLUMNS.get(slug, (0.22, 0.78)))
+    if slug not in NO_PACK and not found:
+        raise SystemExit(f"{slug}: the old KLENZ print was not found; check its crop box")
+    for box, vertical in COVER_UP.get(slug, []):
+        erase(photo, box, vertical)
+    save(photo, PRODUCTS_OUT / f"{slug}.jpg")
 
 banner = catalogue.crop(BANNER)
 banner = banner.resize((banner.width * 2, banner.height * 2), Image.Resampling.LANCZOS)

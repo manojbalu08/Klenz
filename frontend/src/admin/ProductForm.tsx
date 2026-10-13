@@ -12,6 +12,7 @@ const EMPTY: ProductInput = {
   category: '',
   description: '',
   spec: '',
+  price: 0,
   art: 'box',
   tint: 'soft',
   image_url: '',
@@ -30,6 +31,8 @@ interface ProductFormProps {
 /** Add / edit product dialog, used on the Dashboard and the Products page. */
 export default function ProductForm({ product, categories, onClose, onSaved, onDeleted }: ProductFormProps) {
   const [values, setValues] = useState<ProductInput>(() => (product ? { ...EMPTY, ...product } : EMPTY))
+  // Typed as text so "120." can be typed on the way to "120.50"; empty means "Price on request".
+  const [priceText, setPriceText] = useState(() => (product && product.price > 0 ? String(product.price) : ''))
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -41,10 +44,16 @@ export default function ProductForm({ product, categories, onClose, onSaved, onD
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
+    const price = priceText.trim() === '' ? 0 : Number(priceText.trim())
+    if (Number.isNaN(price) || price < 0) {
+      setErrors((current) => ({ ...current, price: 'Enter a price like 120 or 120.50, or leave it empty.' }))
+      return
+    }
     setBusy(true)
     setError(null)
+    const payload = { ...values, price }
     try {
-      onSaved(product ? await api.updateProduct(product.id, values) : await api.createProduct(values))
+      onSaved(product ? await api.updateProduct(product.id, payload) : await api.createProduct(payload))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save the product.')
       if (err instanceof ApiError) setErrors(err.fields)
@@ -113,6 +122,23 @@ export default function ProductForm({ product, categories, onClose, onSaved, onD
               aria-invalid={Boolean(errors.spec)}
             />
             {fieldError('spec')}
+          </label>
+          <label className={ui.field}>
+            <span className={ui.label}>Price per pack (₹)</span>
+            <input
+              className={ui.input}
+              inputMode="decimal"
+              value={priceText}
+              onChange={(e) => {
+                setPriceText(e.target.value)
+                setErrors((current) => ({ ...current, price: '' }))
+              }}
+              placeholder="e.g. 120"
+              maxLength={10}
+              aria-invalid={Boolean(errors.price)}
+            />
+            <span className={ui.help}>Empty shows “Price on request”.</span>
+            {fieldError('price')}
           </label>
         </div>
 

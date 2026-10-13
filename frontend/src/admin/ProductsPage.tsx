@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { api } from '../lib/api'
+import { rupees } from '../lib/format'
 import type { AdminProduct } from '../lib/types'
 import ui from './admin.module.css'
 import ProductForm from './ProductForm'
@@ -54,6 +55,7 @@ export default function ProductsPage() {
                 <th>Product</th>
                 <th>Category</th>
                 <th>Pack size</th>
+                <th>Price</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -96,6 +98,7 @@ export default function ProductsPage() {
                   </td>
                   <td className={ui.muted}>{product.category}</td>
                   <td className={ui.nowrap}>{product.spec || '—'}</td>
+                  <td className={ui.nowrap}>{product.price > 0 ? rupees(product.price) : <span className={ui.muted}>On request</span>}</td>
                   <td>
                     <LivePill live={product.is_live} />
                   </td>

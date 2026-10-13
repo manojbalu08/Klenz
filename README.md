@@ -1,6 +1,6 @@
 # Klenz website
 
-Online shop and admin dashboard for Klenz tissue products. Customers pick products from the Klenz catalogue, choose quantities and send the order on WhatsApp; there are no prices on the site, Klenz replies with a quote. Staff manage products, enquiries, page text, videos and business details from `/admin`.
+Online shop and admin dashboard for Klenz tissue products. Customers pick products from the Klenz catalogue and place the order in the cart popup: they pay now with a UPI QR for the exact total, or choose to pay later. Every order is saved, sent to the admin's WhatsApp automatically, and the customer can send it on WhatsApp too. Staff manage products and prices, orders and payments, page text, videos and business details from `/admin`.
 
 - **Frontend:** React 19 + TypeScript + Vite (`frontend/`)
 - **Backend:** Python FastAPI + SQLAlchemy (`backend/`)
@@ -63,8 +63,8 @@ The client's original files are in `Images/`. The `tools/` scripts turn them int
 
 ```bat
 pip install -r tools\requirements.txt
-python tools\crop_catalogue.py       & rem product photos cut from Images\products.jpeg
-python tools\make_brand_images.py    & rem round logo, favicons, hero photo
+python tools\crop_catalogue.py       & rem product photos from Images\products.jpeg, with the real Klenz logo
+python tools\make_brand_images.py    & rem round logo, favicons, hero photo, "Your brand on every pack" pictures
 python tools\make_videos.py          & rem the four product videos (needs frontend\node_modules for fonts)
 ```
 

@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from ...database import get_db
 from ...models import ORDER_REFERENCE_OFFSET, Order
-from ...schemas import ORDER_STATUSES, OrderListOut, OrderOut, OrderStatus, OrderStatusIn
+from ...schemas import ORDER_STATUSES, OrderListOut, OrderOut, OrderStatus, OrderUpdateIn
 from .common import get_or_404
 
 router = APIRouter()
@@ -52,9 +52,12 @@ def get_order(order_id: int, db: Session = Depends(get_db)) -> Order:
 
 
 @router.patch("/orders/{order_id}", response_model=OrderOut)
-def update_order_status(order_id: int, payload: OrderStatusIn, db: Session = Depends(get_db)) -> Order:
+def update_order(order_id: int, payload: OrderUpdateIn, db: Session = Depends(get_db)) -> Order:
     order = get_or_404(db, Order, order_id, "Order")
-    order.status = payload.status
+    if payload.status is not None:
+        order.status = payload.status
+    if payload.payment_status is not None:
+        order.payment_status = payload.payment_status
     db.commit()
     db.refresh(order)
     return order

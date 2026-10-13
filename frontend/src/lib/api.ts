@@ -4,10 +4,12 @@ import type {
   ContentPage,
   Dashboard,
   Order,
+  OrderAlerts,
   OrderCreated,
   OrderInput,
   OrderList,
   OrderStatus,
+  PaymentStatus,
   ProductInput,
   SiteData,
   SiteSettings,
@@ -135,8 +137,8 @@ export const api = {
     if (filters.q) params.set('q', filters.q)
     return get<OrderList>(`/api/admin/orders?${params}`)
   },
-  updateOrderStatus: (id: number, status: OrderStatus) =>
-    send<Order>('PATCH', `/api/admin/orders/${id}`, { status }),
+  updateOrder: (id: number, changes: { status?: OrderStatus; payment_status?: PaymentStatus }) =>
+    send<Order>('PATCH', `/api/admin/orders/${id}`, changes),
   deleteOrder: (id: number) => send<void>('DELETE', `/api/admin/orders/${id}`),
 
   content: () => get<ContentPage[]>('/api/admin/content'),
@@ -150,6 +152,11 @@ export const api = {
 
   settings: () => get<SiteSettings>('/api/admin/settings'),
   updateSettings: (settings: SiteSettings) => send<SiteSettings>('PUT', '/api/admin/settings', settings),
+  orderAlerts: () => get<OrderAlerts>('/api/admin/settings/alerts'),
+  /** Leave `apikey` out to keep the saved key; "" removes it. */
+  updateOrderAlerts: (alerts: { phone: string; apikey?: string }) =>
+    send<OrderAlerts>('PUT', '/api/admin/settings/alerts', alerts),
+  testOrderAlert: () => send<{ ok: boolean; detail: string }>('POST', '/api/admin/settings/alerts/test'),
   changePassword: (currentPassword: string, newPassword: string) =>
     send<TokenResponse>('POST', '/api/admin/account/password', {
       current_password: currentPassword,

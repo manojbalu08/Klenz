@@ -6,10 +6,11 @@ from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import Request
-from sqlalchemy import URL, DateTime, Engine, create_engine, event, text
+from sqlalchemy import URL, DateTime, Engine, create_engine, event, inspect, text
 from sqlalchemy.engine import Dialect, make_url
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.pool import StaticPool
+from sqlalchemy.schema import CreateColumn
 from sqlalchemy.types import TypeDecorator
 
 
@@ -133,6 +134,29 @@ def apply_mysql_table_options(engine: Engine) -> None:
         table.dialect_kwargs["mysql_engine"] = "InnoDB"
         table.dialect_kwargs["mysql_default_charset"] = charset
         table.dialect_kwargs["mysql_collate"] = collation
+
+
+def add_missing_columns(engine: Engine) -> list[str]:
+    """Add columns the models gained after a table was created.
+
+    create_all() never changes an existing table, so a new column (with a server default)
+    reaches the live database here, on the next start. Returns "table.column" for each one added.
+    """
+    inspector = inspect(engine)
+    existing_tables = set(inspector.get_table_names())
+    added: list[str] = []
+    with engine.begin() as conn:
+        for table in Base.metadata.sorted_tables:
+            if table.name not in existing_tables:
+                continue
+            present = {column["name"] for column in inspector.get_columns(table.name)}
+            for column in table.columns:
+                if column.name in present:
+                    continue
+                definition = CreateColumn(column).compile(dialect=engine.dialect)
+                conn.execute(text(f"ALTER TABLE {engine.dialect.identifier_preparer.format_table(table)} ADD COLUMN {definition}"))
+                added.append(f"{table.name}.{column.name}")
+    return added
 
 
 def get_db(request: Request) -> Iterator[Session]:

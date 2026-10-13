@@ -1,17 +1,25 @@
 """Database tables.
 
 String columns that are indexed stay at 191 characters or less so the indexes fit
-MySQL's 767-byte key limit with utf8mb4 on older servers.
+MySQL's 767-byte key limit with utf8mb4 on older servers. Columns added after the first
+release have a server_default, so add_missing_columns() can add them to existing tables.
 """
 
 from datetime import datetime
+from decimal import Decimal
 
-from sqlalchemy import ForeignKey, String, Text
+from sqlalchemy import ForeignKey, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .database import Base, UTCDateTime, utcnow
 
 ORDER_REFERENCE_OFFSET = 10000
+ZERO = Decimal("0")
+
+
+def money() -> Numeric[Decimal]:
+    """Rupees with paise, e.g. 1250.50."""
+    return Numeric(10, 2)
 
 
 class AdminUser(Base):
@@ -33,8 +41,10 @@ class Product(Base):
     name: Mapped[str] = mapped_column(String(120))
     category: Mapped[str] = mapped_column(String(60))
     description: Mapped[str] = mapped_column(String(500), default="")
-    # Pack size shown instead of a price, e.g. "80 grams" or "100 pulls".
+    # Pack size, e.g. "80 grams" or "100 pulls".
     spec: Mapped[str] = mapped_column(String(120), default="")
+    # Price per pack in rupees; 0 shows "Price on request".
+    price: Mapped[Decimal] = mapped_column(money(), default=ZERO, server_default="0")
     # Which drawing the product card shows: box, pocket, roll, towel or napkin.
     art: Mapped[str] = mapped_column(String(20), default="box")
     # Card background: "soft" or "soft2" from the active colour theme.
@@ -48,9 +58,10 @@ class Product(Base):
 
 
 class Order(Base):
-    """An order request from the Contact page (shown as an enquiry in the admin).
+    """An order placed from the cart popup (an enquiry in the admin).
 
-    There are no prices on the website: Klenz replies with a quote on WhatsApp.
+    Prices are copied from the products when the order is placed. Items without a price
+    are confirmed by Klenz on WhatsApp.
     """
 
     __tablename__ = "orders"
@@ -60,8 +71,16 @@ class Order(Base):
     phone: Mapped[str] = mapped_column(String(30))
     address: Mapped[str] = mapped_column(Text, default="")
     note: Mapped[str] = mapped_column(Text, default="")
-    # new -> quoted -> closed
+    # new -> quoted (confirmed) -> closed
     status: Mapped[str] = mapped_column(String(20), default="new", index=True)
+    # Sum of the priced items when the order was placed.
+    total: Mapped[Decimal] = mapped_column(money(), default=ZERO, server_default="0")
+    # "now": paid with the UPI QR at checkout; "later": pays later (cash or UPI on delivery).
+    payment_method: Mapped[str] = mapped_column(String(10), default="later", server_default="later")
+    # pending -> reported (customer says paid) -> paid (admin checked the bank)
+    payment_status: Mapped[str] = mapped_column(String(10), default="pending", server_default="pending")
+    # UPI transaction reference (UTR) the customer typed in, if any.
+    payment_ref: Mapped[str] = mapped_column(String(40), default="", server_default="")
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow, index=True)
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow, onupdate=utcnow)
 
@@ -81,6 +100,11 @@ class Order(Base):
     def summary(self) -> str:
         return ", ".join(f"{item.product_name} × {item.quantity}" for item in self.items)
 
+    @property
+    def price_pending(self) -> bool:
+        """Some items had no price, so the total is not final yet."""
+        return any(item.unit_price <= 0 for item in self.items)
+
 
 class OrderItem(Base):
     __tablename__ = "order_items"
@@ -90,10 +114,13 @@ class OrderItem(Base):
     product_id: Mapped[int | None] = mapped_column(
         ForeignKey("products.id", ondelete="SET NULL"), index=True
     )
-    # Copied from the product so old orders keep their name and pack size.
+    # Copied from the product so old orders keep their name, pack size and price.
     product_name: Mapped[str] = mapped_column(String(120))
     product_spec: Mapped[str] = mapped_column(String(120), default="")
     quantity: Mapped[int]
+    # Price per pack when ordered (0 = price on request) and price × quantity.
+    unit_price: Mapped[Decimal] = mapped_column(money(), default=ZERO, server_default="0")
+    line_total: Mapped[Decimal] = mapped_column(money(), default=ZERO, server_default="0")
 
     order: Mapped[Order] = relationship(back_populates="items")
 

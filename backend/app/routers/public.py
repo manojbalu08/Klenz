@@ -1,14 +1,15 @@
 """Endpoints the public website uses."""
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..models import Order, OrderItem, Product, Video
+from ..models import ZERO, Order, OrderItem, Product, Video
+from ..notify import order_alert_text, send_order_alert
 from ..ratelimit import RateLimiter, client_ip
 from ..schemas import OrderCreatedOut, OrderIn, ProductOut, SiteOut, VideoOut
-from ..store import read_content, read_settings
+from ..store import read_alert_target, read_content, read_settings
 
 router = APIRouter(prefix="/api", tags=["public"])
 
@@ -28,7 +29,9 @@ def get_site(db: Session = Depends(get_db)) -> SiteOut:
 
 
 @router.post("/orders", response_model=OrderCreatedOut, status_code=status.HTTP_201_CREATED)
-def create_order(payload: OrderIn, request: Request, db: Session = Depends(get_db)) -> Order:
+def create_order(
+    payload: OrderIn, request: Request, background: BackgroundTasks, db: Session = Depends(get_db)
+) -> Order:
     limiter: RateLimiter = request.app.state.order_limiter
     ip = client_ip(request)
     if limiter.is_blocked(ip):
@@ -49,14 +52,33 @@ def create_order(payload: OrderIn, request: Request, db: Session = Depends(get_d
             {"message": "Some items in your cart are no longer available.", "unavailable": unavailable},
         )
 
-    order = Order(customer_name=payload.customer_name, phone=payload.phone, address=payload.address, note=payload.note)
+    paying_now = payload.payment_method == "now"
+    order = Order(
+        customer_name=payload.customer_name,
+        phone=payload.phone,
+        address=payload.address,
+        note=payload.note,
+        payment_method=payload.payment_method,
+        # A QR payment is only the shopper's word until the admin checks the bank.
+        payment_status="reported" if paying_now else "pending",
+        payment_ref=payload.payment_ref if paying_now else "",
+    )
+    total = ZERO
     for product_id, quantity in quantities.items():
         product = products[product_id]
+        line_total = product.price * quantity
+        total += line_total
         order.items.append(
-            OrderItem(product_id=product.id, product_name=product.name, product_spec=product.spec, quantity=quantity)
+            OrderItem(product_id=product.id, product_name=product.name, product_spec=product.spec,
+                      quantity=quantity, unit_price=product.price, line_total=line_total)
         )
+    order.total = total
     db.add(order)
     db.commit()
     db.refresh(order)
     limiter.hit(ip)
+
+    phone, apikey = read_alert_target(db)
+    if apikey:
+        background.add_task(send_order_alert, phone, apikey, order_alert_text(order))
     return order
