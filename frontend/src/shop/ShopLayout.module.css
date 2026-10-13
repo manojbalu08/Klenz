@@ -1,9 +1,23 @@
 .shop {
   position: relative;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   font-family: 'DM Sans', sans-serif;
   color: var(--ink);
   background: var(--bg);
+}
+
+/* On short pages the footer stays at the bottom and the last section (with its animated background)
+   stretches to meet it, so no empty strip is left. */
+.shop > main {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.shop > main > :last-child {
+  flex-grow: 1;
 }
 
 .shop a:hover {

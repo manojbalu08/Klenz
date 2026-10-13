@@ -9,6 +9,13 @@
   margin: 0 auto;
 }
 
+/* A section with the animated brand background (components/ThemeBackdrop) behind its content. */
+.themed {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
 .stack {
   display: flex;
   flex-direction: column;

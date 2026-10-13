@@ -6,25 +6,6 @@
   padding: 72px clamp(20px, 5vw, 64px) 128px;
 }
 
-.heroCircleA {
-  right: -120px;
-  top: -150px;
-  width: 440px;
-  height: 440px;
-  background: var(--soft2);
-  animation: drift 14s ease-in-out infinite alternate;
-}
-
-.heroCircleB {
-  left: -110px;
-  bottom: -170px;
-  width: 330px;
-  height: 330px;
-  background: var(--accent);
-  opacity: 0.35;
-  animation: drift 18s ease-in-out infinite alternate-reverse;
-}
-
 .heroInner {
   position: relative;
   max-width: 1232px;
@@ -199,6 +180,7 @@
   width: 72%;
   aspect-ratio: 1;
   background: var(--soft2);
+  animation: breathe 9s ease-in-out infinite;
 }
 
 .storyPhoto {
@@ -364,15 +346,6 @@
   overflow: hidden;
   background: var(--ink);
   color: #fff;
-}
-
-.rangeGlow {
-  right: -160px;
-  top: -200px;
-  width: 520px;
-  height: 520px;
-  background: radial-gradient(circle, var(--primary), transparent 70%);
-  opacity: 0.55;
 }
 
 .rangeInner {
@@ -826,9 +799,9 @@
 
 /* ── Motion ───────────────────────────────────────────── */
 
-@keyframes drift {
-  to {
-    transform: translate(-30px, 24px) scale(1.06);
+@keyframes breathe {
+  50% {
+    transform: scale(1.06);
   }
 }
 

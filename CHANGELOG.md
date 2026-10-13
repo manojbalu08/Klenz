@@ -2,6 +2,13 @@
 
 What was built and decided, in order, so the next round of changes can start from here. How-to guides: [README.md](README.md) (run it on your PC), [DEPLOY.md](DEPLOY.md) (hosting and updates), [CLAUDE.md](CLAUDE.md) (code map for developers and Claude Code).
 
+## 13 October 2026 (late night): animated theme background on every page
+
+- Every section of Home, About Us, Contact Us, the "page not found" page and the admin sign-in page now has the same animated brand background: soft glows that drift, bubbles that rise, a fine dot texture, and flowing lines along the bottom like the lines printed on the Klenz packs. It comes in three tones: light sections, the soft blue page tops and the navy bands.
+- Removed the plain and static backgrounds: the big flat circles on the page tops and the sign-in page, and the bare backgrounds of "Ordering takes 3 steps", "Your brand on every pack", the bulk banner and the Contact cards.
+- On short pages the footer now sits at the bottom of the screen, so no empty strip is left below it.
+- The animation pauses for sections that are off screen. Visitors whose phone asks for less motion get the still version without bubbles.
+
 ## 13 October 2026 (late night): new About Us page
 
 - The About Us page was rebuilt with real content from the visiting card and catalogue, replacing the "[ … ]" placeholders:

@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router'
 import Logo from '../components/Logo'
+import ThemeBackdrop from '../components/ThemeBackdrop'
 import { useAuth } from './AuthContext'
 import styles from './LoginPage.module.css'
 
@@ -36,16 +37,14 @@ export default function LoginPage() {
       <title>Admin sign in — Klenz</title>
 
       <div className={styles.welcome}>
-        <div className={styles.sun} aria-hidden="true" />
-        <div className={styles.glow} aria-hidden="true" />
-        <div className={styles.tile} aria-hidden="true" />
+        <ThemeBackdrop tone="dark" />
         <Link to="/" className={styles.brand}>
           <Logo size={48} />
           <span>Klenz</span>
         </Link>
         <div className={styles.welcomeText}>
           <h1>Welcome back to your Klenz dashboard</h1>
-          <p>See new orders from WhatsApp, update products and change your website videos.</p>
+          <p>See new orders, update products and prices, and change your website text and videos.</p>
         </div>
         <div className={styles.chips}>
           <span>Orders</span>
@@ -55,6 +54,7 @@ export default function LoginPage() {
       </div>
 
       <div className={styles.formSide}>
+        <ThemeBackdrop layout={2} />
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.formHead}>
             <h2>Admin sign in</h2>

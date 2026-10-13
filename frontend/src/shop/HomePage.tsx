@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { CheckIcon, IdealIcon } from '../components/icons'
 import { Reveal, useReducedMotion } from '../components/motion'
+import ThemeBackdrop from '../components/ThemeBackdrop'
 import { lines } from '../lib/format'
 import type { Product } from '../lib/types'
 import Headline from './Headline'
@@ -19,13 +20,8 @@ export default function HomePage() {
     <>
       <title>Klenz — Tissue paper, made by Klenz</title>
 
-      <section className={`${ui.pageHero} ${styles.hero}`}>
-        <div className={`${ui.circle} ${styles.driftSlow}`} style={{ right: -120, top: -140, width: 460, height: 460, background: 'var(--soft2)' }} />
-        <div
-          className={`${ui.circle} ${styles.driftFast}`}
-          style={{ left: -90, bottom: -120, width: 320, height: 320, background: 'var(--accent)', opacity: 0.55 }}
-        />
-        <Bubbles />
+      <section className={`${ui.pageHero} ${ui.themed} ${styles.hero}`}>
+        <ThemeBackdrop tone="hero" />
         <div className={styles.heroInner}>
           <div className={styles.heroText}>
             <span className={ui.badge}>{c['home.badge']}</span>
@@ -47,9 +43,8 @@ export default function HomePage() {
 
       {highlights.length > 0 && <Highlights items={highlights} />}
 
-      <section id="shop" className={`${ui.section} ${styles.anchor} ${styles.shop}`}>
-        <span className={`${ui.circle} ${styles.shopGlowA}`} aria-hidden="true" />
-        <span className={`${ui.circle} ${styles.shopGlowB}`} aria-hidden="true" />
+      <section id="shop" className={`${ui.section} ${ui.themed} ${styles.anchor} ${styles.shop}`}>
+        <ThemeBackdrop layout={2} />
         <div className={`${ui.container} ${ui.stack} ${styles.shopInner}`}>
           <ProductGrid
             products={products}
@@ -63,7 +58,8 @@ export default function HomePage() {
       <IdealFor eyebrow={c['home.ideal_eyebrow']} title={c['home.ideal_title']} items={lines(c['home.ideal_items'])} />
 
       {videos.length > 0 && (
-        <section id="videos" className={`${ui.section} ${styles.videos} ${styles.anchor}`}>
+        <section id="videos" className={`${ui.section} ${ui.themed} ${styles.videos} ${styles.anchor}`}>
+          <ThemeBackdrop tone="dark" layout={3} />
           <div className={`${ui.container} ${ui.stack}`}>
             <Reveal className={ui.heading}>
               <span className={`${ui.eyebrow} ${styles.videosEyebrow}`}>{c['home.videos_eyebrow']}</span>
@@ -77,7 +73,8 @@ export default function HomePage() {
         </section>
       )}
 
-      <section className={ui.section}>
+      <section className={`${ui.section} ${ui.themed}`}>
+        <ThemeBackdrop layout={2} />
         <div className={`${ui.container} ${ui.stack}`}>
           <Reveal>
             <h2 className={ui.title}>{c['home.steps_title']}</h2>
@@ -105,7 +102,8 @@ export default function HomePage() {
         points={lines(c['home.branding_points'])}
       />
 
-      <section className={styles.bulkSection}>
+      <section className={`${ui.themed} ${styles.bulkSection}`}>
+        <ThemeBackdrop layout={1} />
         <Reveal className={styles.bulk}>
           <div className={styles.bulkText}>
             <h2 className={`${ui.display} ${styles.bulkTitle}`}>{c['home.bulk_title']}</h2>
@@ -163,17 +161,6 @@ function HeroArt({ photo, video }: { photo: string; video: string }) {
           <span className={styles.artRollCore} aria-hidden="true" />
         </>
       )}
-    </div>
-  )
-}
-
-/** Soft circles that float up behind the hero, like tissue in the air. */
-function Bubbles() {
-  return (
-    <div className={styles.bubbles} aria-hidden="true">
-      {[0, 1, 2, 3, 4, 5].map((i) => (
-        <span key={i} className={styles.bubble} />
-      ))}
     </div>
   )
 }
@@ -257,7 +244,8 @@ function ProductGrid({ products, eyebrow, title, note }: ProductGridProps) {
 function IdealFor({ eyebrow, title, items }: { eyebrow: string; title: string; items: string[] }) {
   if (items.length === 0) return null
   return (
-    <section className={`${ui.section} ${styles.ideal}`}>
+    <section className={`${ui.section} ${ui.themed} ${styles.ideal}`}>
+      <ThemeBackdrop layout={1} />
       <div className={`${ui.container} ${ui.stack}`}>
         <Reveal className={ui.heading}>
           <span className={ui.eyebrow}>{eyebrow}</span>
@@ -289,7 +277,8 @@ interface BrandingProps {
 
 function Branding({ eyebrow, title, text, points }: BrandingProps) {
   return (
-    <section className={`${ui.section} ${styles.branding}`}>
+    <section className={`${ui.section} ${ui.themed} ${styles.branding}`}>
+      <ThemeBackdrop layout={3} />
       <div className={`${ui.container} ${styles.brandingInner}`}>
         <Reveal className={styles.brandingMedia}>
           <span className={`${ui.circle} ${styles.brandingGlow}`} aria-hidden="true" />

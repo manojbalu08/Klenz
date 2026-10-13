@@ -194,75 +194,6 @@
   background: var(--primary);
 }
 
-/* Big background circles drift slowly. */
-.driftSlow {
-  animation: drift 16s ease-in-out infinite alternate;
-}
-
-.driftFast {
-  animation: drift 11s ease-in-out infinite alternate-reverse;
-}
-
-/* Soft bubbles rising behind the hero. */
-.bubbles {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.bubble {
-  position: absolute;
-  bottom: -60px;
-  left: 10%;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.75);
-  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.25);
-  animation: bubble-up 14s linear infinite;
-}
-
-.bubble:nth-child(2) {
-  left: 24%;
-  width: 10px;
-  height: 10px;
-  animation-duration: 10s;
-  animation-delay: -6s;
-}
-
-.bubble:nth-child(3) {
-  left: 41%;
-  width: 24px;
-  height: 24px;
-  animation-duration: 17s;
-  animation-delay: -9s;
-}
-
-.bubble:nth-child(4) {
-  left: 58%;
-  width: 12px;
-  height: 12px;
-  animation-duration: 12s;
-  animation-delay: -1s;
-}
-
-.bubble:nth-child(5) {
-  left: 76%;
-  width: 20px;
-  height: 20px;
-  animation-duration: 15s;
-  animation-delay: -11s;
-}
-
-.bubble:nth-child(6) {
-  left: 92%;
-  width: 14px;
-  height: 14px;
-  animation-duration: 11s;
-  animation-delay: -4s;
-}
-
 /* The illustration is drawn at a fixed size; shrink it to fit phones. */
 @media (max-width: 560px) {
   .heroArt {
@@ -323,34 +254,9 @@
   scroll-margin-top: 80px;
 }
 
-/* Soft brand backdrop behind the product cards: glow, fine dot pattern and drifting circles. */
+/* Soft brand gradient behind the product cards (the animated backdrop adds glows, dots and bubbles). */
 .shop {
-  position: relative;
-  overflow: hidden;
-  background:
-    radial-gradient(rgba(29, 95, 224, 0.09) 1.2px, transparent 1.4px) 0 0 / 22px 22px,
-    radial-gradient(circle at 10% 12%, rgba(34, 211, 238, 0.18), transparent 40%),
-    radial-gradient(circle at 92% 88%, rgba(29, 95, 224, 0.14), transparent 46%),
-    linear-gradient(180deg, var(--bg) 0%, var(--soft) 100%);
-}
-
-.shopGlowA {
-  right: -160px;
-  top: 60px;
-  width: 440px;
-  height: 440px;
-  background: var(--soft2);
-  opacity: 0.7;
-  animation: drift 18s ease-in-out infinite alternate;
-}
-
-.shopGlowB {
-  left: -140px;
-  bottom: -120px;
-  width: 380px;
-  height: 380px;
-  background: var(--soft);
-  animation: drift 14s ease-in-out infinite alternate-reverse;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--soft) 100%);
 }
 
 .shopInner {
@@ -774,33 +680,6 @@
   }
 }
 
-@keyframes drift {
-  to {
-    transform: translate(-30px, 24px) scale(1.06);
-  }
-}
-
-@keyframes bubble-up {
-  0% {
-    transform: translate(0, 0);
-    opacity: 0;
-  }
-
-  10%,
-  85% {
-    opacity: 1;
-  }
-
-  50% {
-    transform: translate(18px, -380px);
-  }
-
-  100% {
-    transform: translate(-8px, -780px);
-    opacity: 0;
-  }
-}
-
 @keyframes sweep {
   0% {
     left: -60%;
@@ -858,7 +737,6 @@
     display: none;
   }
 
-  .bubbles,
   .shine::after {
     display: none;
   }

@@ -1,11 +1,12 @@
 import { Link } from 'react-router'
+import ThemeBackdrop from '../components/ThemeBackdrop'
 import ui from './ui.module.css'
 
 export default function NotFoundPage() {
   return (
-    <section className={`${ui.pageHero} ${ui.section}`}>
+    <section className={`${ui.pageHero} ${ui.themed} ${ui.section}`}>
       <title>Page not found — Klenz</title>
-      <div className={ui.circle} style={{ right: -80, top: -100, width: 340, height: 340, background: 'var(--accent)', opacity: 0.55 }} />
+      <ThemeBackdrop tone="hero" />
       <div className={ui.heroInner} style={{ gap: 20 }}>
         <span className={ui.badge}>404</span>
         <h1 className={ui.title}>We couldn’t find that page</h1>

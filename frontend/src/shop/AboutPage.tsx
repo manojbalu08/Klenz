@@ -11,6 +11,7 @@ import {
   WhatsAppIcon,
 } from '../components/icons'
 import { Reveal } from '../components/motion'
+import ThemeBackdrop from '../components/ThemeBackdrop'
 import { lines, pairs } from '../lib/format'
 import type { Product } from '../lib/types'
 import { whatsappLink, whatsappNumber } from '../lib/whatsapp'
@@ -78,9 +79,8 @@ export default function AboutPage() {
     <>
       <title>About Klenz</title>
 
-      <section className={`${ui.pageHero} ${styles.hero}`}>
-        <span className={`${ui.circle} ${styles.heroCircleA}`} aria-hidden="true" />
-        <span className={`${ui.circle} ${styles.heroCircleB}`} aria-hidden="true" />
+      <section className={`${ui.pageHero} ${ui.themed} ${styles.hero}`}>
+        <ThemeBackdrop tone="hero" />
         <div className={styles.heroInner}>
           <div className={styles.heroText}>
             <span className={ui.badge}>{c['about.badge']}</span>
@@ -136,7 +136,8 @@ export default function AboutPage() {
         </div>
       )}
 
-      <section className={`${ui.section} ${styles.story}`}>
+      <section className={`${ui.section} ${ui.themed} ${styles.story}`}>
+        <ThemeBackdrop layout={2} />
         <div className={`${ui.container} ${styles.storyInner}`}>
           {c['about.photo_url'] && (
             <Reveal className={styles.storyMedia}>
@@ -169,7 +170,8 @@ export default function AboutPage() {
       </section>
 
       {values.length > 0 && (
-        <section className={`${ui.section} ${styles.values}`}>
+        <section className={`${ui.section} ${ui.themed} ${styles.values}`}>
+          <ThemeBackdrop layout={1} />
           <div className={`${ui.container} ${ui.stack}`}>
             <Reveal className={`${ui.heading} ${styles.centered}`}>
               <span className={ui.eyebrow}>{c['about.values_eyebrow']}</span>
@@ -200,8 +202,8 @@ export default function AboutPage() {
       )}
 
       {ranges.length > 0 && (
-        <section className={`${ui.section} ${styles.range}`}>
-          <span className={`${ui.circle} ${styles.rangeGlow}`} aria-hidden="true" />
+        <section className={`${ui.section} ${ui.themed} ${styles.range}`}>
+          <ThemeBackdrop tone="dark" layout={2} />
           <div className={`${ui.container} ${ui.stack} ${styles.rangeInner}`}>
             <Reveal className={ui.heading}>
               <span className={`${ui.eyebrow} ${styles.rangeEyebrow}`}>{c['about.range_eyebrow']}</span>
@@ -247,7 +249,8 @@ export default function AboutPage() {
       )}
 
       {people.length > 0 && (
-        <section className={`${ui.section} ${styles.team}`}>
+        <section className={`${ui.section} ${ui.themed} ${styles.team}`}>
+          <ThemeBackdrop layout={3} />
           <div className={`${ui.container} ${ui.stack}`}>
             <Reveal className={`${ui.heading} ${styles.centered}`}>
               <span className={ui.eyebrow}>{c['about.team_eyebrow']}</span>
@@ -261,7 +264,11 @@ export default function AboutPage() {
                 <li key={index}>
                   <Reveal delay={index * 140} className={styles.person}>
                     <span className={styles.avatar}>
-                      {person.photo ? <img src={person.photo} alt={person.name} loading="lazy" /> : <UserIcon size={58} />}
+                      {person.photo ? (
+                        <img src={person.photo} alt={person.name} loading="lazy" />
+                      ) : (
+                        <UserIcon size={58} />
+                      )}
                     </span>
                     <h3 className={styles.personName}>{person.name}</h3>
                     {person.role && <span className={styles.personRole}>{person.role}</span>}
@@ -274,7 +281,8 @@ export default function AboutPage() {
         </section>
       )}
 
-      <section className={`${ui.section} ${styles.customers}`}>
+      <section className={`${ui.section} ${ui.themed} ${styles.customers}`}>
+        <ThemeBackdrop layout={1} />
         <div className={`${ui.container} ${ui.stack}`}>
           <Reveal className={ui.heading}>
             <span className={ui.eyebrow}>{c['about.customers_eyebrow']}</span>

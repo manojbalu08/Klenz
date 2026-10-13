@@ -1,5 +1,5 @@
 .hero {
-  padding: 64px clamp(20px, 5vw, 64px) 56px;
+  padding: 64px clamp(20px, 5vw, 64px) 104px;
 }
 
 .heroInner {
@@ -18,13 +18,15 @@
 }
 
 .main {
+  padding: 48px clamp(20px, 5vw, 64px) 80px;
+}
+
+.mainInner {
   max-width: 1232px;
   margin: 0 auto;
-  padding: 48px clamp(20px, 5vw, 64px) 80px;
   display: flex;
   flex-direction: column;
   gap: 36px;
-  box-sizing: content-box;
 }
 
 /* Call · WhatsApp · Email · Find us · Hours */

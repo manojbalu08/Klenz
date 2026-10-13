@@ -1,0 +1,313 @@
+/* Animated brand background (ThemeBackdrop.tsx). Behind the content of a `ui.themed` section. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  /* Fades out at the top and bottom, so neighbouring sections join without a seam. */
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.backdrop[data-paused] * {
+  animation-play-state: paused;
+}
+
+/* ── Glows: soft colour that drifts ───────────────────── */
+
+.glow {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+  animation: drift 22s ease-in-out infinite alternate;
+}
+
+.glowA {
+  right: -180px;
+  top: -160px;
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(circle, var(--accent), transparent 68%);
+  opacity: 0.24;
+}
+
+.glowB {
+  left: -170px;
+  bottom: -170px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--primary), transparent 68%);
+  opacity: 0.14;
+  animation-name: drift-back;
+  animation-duration: 26s;
+}
+
+.glowC {
+  left: 36%;
+  top: 22%;
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, var(--soft2), transparent 70%);
+  opacity: 0.8;
+  animation-duration: 17s;
+}
+
+.backdrop[data-layout='2'] .glowA {
+  right: auto;
+  left: -220px;
+  top: 6%;
+}
+
+.backdrop[data-layout='2'] .glowB {
+  left: auto;
+  right: -170px;
+  bottom: -140px;
+}
+
+.backdrop[data-layout='2'] .glowC {
+  left: 58%;
+  top: -12%;
+}
+
+.backdrop[data-layout='3'] .glowA {
+  right: 8%;
+  top: auto;
+  bottom: -230px;
+}
+
+.backdrop[data-layout='3'] .glowB {
+  left: 14%;
+  top: -190px;
+  bottom: auto;
+}
+
+.backdrop[data-layout='3'] .glowC {
+  left: -10%;
+  top: 38%;
+}
+
+.backdrop[data-tone='hero'] .glowA {
+  opacity: 0.4;
+}
+
+.backdrop[data-tone='hero'] .glowB {
+  opacity: 0.22;
+}
+
+.backdrop[data-tone='hero'] .glowC {
+  background: radial-gradient(circle, #fff, transparent 70%);
+  opacity: 0.75;
+}
+
+.backdrop[data-tone='dark'] .glowA {
+  background: radial-gradient(circle, var(--primary), transparent 68%);
+  opacity: 0.65;
+}
+
+.backdrop[data-tone='dark'] .glowB {
+  background: radial-gradient(circle, var(--accent), transparent 68%);
+  opacity: 0.2;
+}
+
+.backdrop[data-tone='dark'] .glowC {
+  background: radial-gradient(circle, var(--primary), transparent 70%);
+  opacity: 0.3;
+}
+
+/* ── Fine dot texture, strongest in one corner ────────── */
+
+.dots {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, var(--primary) 1.1px, transparent 1.5px) 0 0 / 24px 24px;
+  opacity: 0.1;
+  -webkit-mask-image: radial-gradient(ellipse at 12% 22%, #000, transparent 55%);
+  mask-image: radial-gradient(ellipse at 12% 22%, #000, transparent 55%);
+}
+
+.backdrop[data-layout='2'] .dots {
+  -webkit-mask-image: radial-gradient(ellipse at 88% 30%, #000, transparent 55%);
+  mask-image: radial-gradient(ellipse at 88% 30%, #000, transparent 55%);
+}
+
+.backdrop[data-layout='3'] .dots {
+  -webkit-mask-image: radial-gradient(ellipse at 50% 90%, #000, transparent 55%);
+  mask-image: radial-gradient(ellipse at 50% 90%, #000, transparent 55%);
+}
+
+.backdrop[data-tone='hero'] .dots {
+  background-image: radial-gradient(circle, #fff 1.3px, transparent 1.7px);
+  opacity: 0.7;
+}
+
+.backdrop[data-tone='dark'] .dots {
+  background-image: radial-gradient(circle, #fff 1px, transparent 1.4px);
+  opacity: 0.12;
+}
+
+/* ── Flowing lines, like the ones printed on the packs, along the bottom ── */
+
+.waves {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2%;
+  height: 90px;
+}
+
+/* Mirrored, so the lines flow the other way. */
+.backdrop[data-layout='2'] .waves {
+  bottom: 4%;
+  transform: scaleX(-1);
+}
+
+.backdrop[data-layout='3'] .waves {
+  height: 70px;
+  opacity: 0.8;
+}
+
+.wave {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 200%;
+  height: 100%;
+  fill: none;
+  stroke: var(--primary);
+  opacity: 0.18;
+  will-change: transform;
+  animation: flow 30s linear infinite;
+}
+
+.wave path {
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.waveSlow {
+  opacity: 0.3;
+  animation-duration: 48s;
+}
+
+.wave .dotted {
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 8;
+}
+
+.backdrop[data-tone='hero'] .wave {
+  stroke: #fff;
+  opacity: 0.85;
+}
+
+.backdrop[data-tone='dark'] .wave {
+  stroke: var(--accent);
+  opacity: 0.28;
+}
+
+/* ── Bubbles rising through the section ───────────────── */
+
+.bubbles {
+  position: absolute;
+  inset: 0;
+}
+
+/* Each bubble rides a lane as tall as the section, so it crosses any section height. */
+.lane {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  will-change: transform, opacity;
+  animation: rise 18s linear infinite;
+}
+
+.bubble {
+  display: block;
+  border: 1.5px solid var(--primary);
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, #fff 0 20%, transparent 28%);
+  opacity: 0.3;
+  animation: sway 5s ease-in-out infinite alternate;
+}
+
+.lane:nth-child(odd) .bubble {
+  animation-duration: 7s;
+}
+
+.backdrop[data-tone='hero'] .bubble {
+  border-color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.22);
+  opacity: 0.9;
+}
+
+.backdrop[data-tone='dark'] .bubble {
+  border-color: #fff;
+  background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.8) 0 20%, transparent 28%);
+  opacity: 0.25;
+}
+
+/* Fewer bubbles on phones. */
+@media (max-width: 560px) {
+  .lane:nth-child(even) {
+    display: none;
+  }
+
+  .glow {
+    scale: 0.7;
+  }
+}
+
+/* Less motion: keep the still glows, dots and lines; no bubbles. */
+@media (prefers-reduced-motion: reduce) {
+  .bubbles {
+    display: none;
+  }
+}
+
+@keyframes drift {
+  to {
+    transform: translate(-60px, 40px) scale(1.1);
+  }
+}
+
+@keyframes drift-back {
+  to {
+    transform: translate(70px, -36px) scale(1.14);
+  }
+}
+
+@keyframes flow {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes rise {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  12%,
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-4%);
+    opacity: 0;
+  }
+}
+
+@keyframes sway {
+  from {
+    transform: translateX(-9px);
+  }
+
+  to {
+    transform: translateX(9px);
+  }
+}
