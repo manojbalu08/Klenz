@@ -152,8 +152,10 @@ function SettingsForm({ initial, onSaved }: { initial: SiteSettings; onSaved: (s
   )
 }
 
+/** CallMeBot's WhatsApp number (it changes now and then; current one on callmebot.com). */
+const CALLMEBOT_NUMBER = '+34 644 45 70 57'
 /** Opens WhatsApp with CallMeBot's activation message filled in. */
-const CALLMEBOT_ACTIVATION = `https://wa.me/34644319565?text=${encodeURIComponent('I allow callmebot to send me messages')}`
+const CALLMEBOT_ACTIVATION = `https://wa.me/${CALLMEBOT_NUMBER.replace(/\D/g, '')}?text=${encodeURIComponent('I allow callmebot to send me messages')}`
 
 interface OrderAlertsFormProps {
   initial: OrderAlerts
@@ -191,12 +193,21 @@ function OrderAlertsForm({ initial, fallbackPhone, onSaved }: OrderAlertsFormPro
   async function sendTest() {
     setBusy(true)
     setMessage(null)
+    const target = initial.phone || fallbackPhone
     try {
       const result = await api.testOrderAlert()
       setMessage(
         result.ok
           ? { ok: true, text: 'Test message sent. Check WhatsApp on the alert phone.' }
-          : { ok: false, text: `CallMeBot did not send it: ${result.detail || 'no answer'}` },
+          : /apikey is invalid/i.test(result.detail)
+            ? {
+                ok: false,
+                text:
+                  `CallMeBot does not accept this key for ${target}. A key only works for the WhatsApp number that ` +
+                  `asked for it: do step 1 on the phone with ${target} and paste the key from its reply, or enter ` +
+                  'the number that got this key as the WhatsApp number for alerts.',
+              }
+            : { ok: false, text: `CallMeBot did not send it: ${result.detail || 'no answer'}` },
       )
     } catch (err) {
       setMessage({ ok: false, text: err instanceof Error ? err.message : 'Could not send the test message.' })
@@ -219,14 +230,18 @@ function OrderAlertsForm({ initial, fallbackPhone, onSaved }: OrderAlertsFormPro
       </p>
       <ol className={styles.steps}>
         <li>
-          On the phone that should get the alerts, send CallMeBot (<strong>+34 644 31 95 65</strong>) the WhatsApp
-          message <strong>I allow callmebot to send me messages</strong>.{' '}
+          On the phone that should get the alerts, save CallMeBot's number <strong>{CALLMEBOT_NUMBER}</strong> in
+          contacts and send it the WhatsApp message <strong>I allow callmebot to send me messages</strong>.{' '}
           <a href={CALLMEBOT_ACTIVATION} target="_blank" rel="noreferrer">
             Open it in WhatsApp
           </a>{' '}
           (open this page on that phone and tap the link, then press Send).
         </li>
-        <li>CallMeBot replies within 2 minutes with an API key. Paste it below and save.</li>
+        <li>
+          CallMeBot replies within 2 minutes with an API key. Paste it below together with the number of that phone, and
+          save. The key only works for the WhatsApp number that sent the message. No reply? CallMeBot asks you to try
+          again after 24 hours.
+        </li>
         <li>
           Press <strong>Send test message</strong>. From then on every new order arrives on that phone by itself. If
           the number above stops working, check{' '}

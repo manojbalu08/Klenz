@@ -2,6 +2,10 @@
 
 What was built and decided, in order, so the next round of changes can start from here. How-to guides: [README.md](README.md) (run it on your PC), [DEPLOY.md](DEPLOY.md) (hosting and updates), [CLAUDE.md](CLAUDE.md) (code map for developers and Claude Code).
 
+## 13 October 2026 (late night): CallMeBot's new number
+
+- CallMeBot now uses **+34 644 45 70 57** for activation (it was +34 644 31 95 65). Admin → Settings and DEPLOY.md use the new number and explain that a key only works for the WhatsApp number that asked for it. A test that CallMeBot rejects with "APIKey is invalid" now says so in plain words. The live alerts (number +91 73973 83403) had a key that did not belong to that number, so they need activating again from that phone.
+
 ## 13 October 2026 (night): orders reach WhatsApp without opening anything
 
 - Placing an order no longer opens a WhatsApp tab or WhatsApp Web for the customer. The popup only says **Order placed successfully** with the order number, and has a **Done** button. The customer never sends a WhatsApp message. The server sends every order to the admin's WhatsApp (+91 95663 78152) by itself through the CallMeBot alert, which must be switched on once in Admin → Settings (one-tap activation link there). The admin dashboard warns while it is off.

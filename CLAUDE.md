@@ -68,7 +68,7 @@ URLs: site http://localhost:5173 · admin http://localhost:5173/admin · API doc
 - Videos must be muted to autoplay; `HeroArt` and `VideoShowcase` set `muted` on the element before `play()`.
 - Money: prices are taken from the database at order time (never from the browser); totals in the browser are summed in paise. A total of 0 with unpriced items shows "On request" (`orderTotal`). "Pay now" needs a total above 0.
 - UPI: the QR is a static `upi://` link (no payment gateway, no fees); a payment is only "reported" until the admin checks the bank and marks it Paid. Without a UPI ID the QR is a clearly marked sample that pays nothing.
-- WhatsApp alerts: CallMeBot only messages the phone that activated it; the API key is write-only in the admin and never returned by any endpoint.
+- WhatsApp alerts: CallMeBot only messages the phone that activated it, and a key only works with that phone's number ("APIKey is invalid" = key and number don't match). Its activation number changes now and then: `CALLMEBOT_NUMBER` in `SettingsPage.tsx` + DEPLOY.md (+34 644 45 70 57 in Oct 2026). The API key is write-only in the admin and never returned by any endpoint.
 - TypeScript: `erasableSyntaxOnly` (no enums or parameter properties), `verbatimModuleSyntax` (`import type`). React 19: `<Context value>` providers, `<title>` inside pages.
 - MySQL compatibility: indexed VARCHAR ≤191 chars, no JSON columns or CHECK constraints, datetimes via `UTCDateTime`, new columns need a `server_default`. SQLAlchemy `URL.set(database=None)` means "unchanged", so use `database=""`. SQLite stores Decimal as float (warning filtered in `pytest.ini`).
 - Starlette 1.x TestClient needs `httpx2` (in requirements-dev.txt).
