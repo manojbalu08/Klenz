@@ -102,3 +102,17 @@
     font-size: 32px;
   }
 }
+
+/* Shown while no CallMeBot key is saved: orders are not reaching WhatsApp yet. */
+.alertsOff {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  border-radius: 18px;
+  background: var(--a-warm);
+  line-height: 1.5;
+}

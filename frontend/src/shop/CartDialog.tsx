@@ -1,13 +1,13 @@
 import { useEffect, useId, useRef, useState, useSyncExternalStore, type ReactElement, type ReactNode } from 'react'
 import { useNavigate } from 'react-router'
 import Dialog from '../components/Dialog'
-import { CheckIcon, QrIcon, WalletIcon, WhatsAppIcon } from '../components/icons'
+import { CheckIcon, QrIcon, WalletIcon } from '../components/icons'
 import QrCode from '../components/QrCode'
 import { api, ApiError } from '../lib/api'
 import { orderTotal, packs, rupees } from '../lib/format'
 import type { OrderCreated, PaymentMethod } from '../lib/types'
 import { SAMPLE_QR_TEXT, upiLink, upiReady } from '../lib/upi'
-import { orderMessage, whatsappLink, whatsappNumber, type CustomerDetails } from '../lib/whatsapp'
+import type { CustomerDetails } from '../lib/whatsapp'
 import { useCart } from './CartContext'
 import styles from './CartDialog.module.css'
 import { tintColor } from './ProductArt'
@@ -57,8 +57,6 @@ function useTouchScreen(): boolean {
 interface Placed {
   order: OrderCreated
   customer: CustomerDetails
-  /** WhatsApp opened by itself with the order (false if the browser blocked the new tab). */
-  whatsappOpened: boolean
 }
 
 /** The cart popup and the whole checkout: cart → details → payment (UPI QR or later) → placed. */
@@ -84,8 +82,6 @@ export default function CartDialog() {
   const method: PaymentMethod = canPayNow ? (chosenMethod ?? 'now') : 'later'
   const qrReady = upiReady(settings)
   const upiNote = `Klenz order ${customer.name}`.trim()
-  // Orders go to the orders number (Admin → Settings), else to the number shown on the site.
-  const orderWhatsApp = whatsappNumber(settings.order_whatsapp || settings.whatsapp_number, settings.country_code)
 
   // Screen readers hear the new step's title; keyboard users continue from the top.
   useEffect(() => {
@@ -126,8 +122,7 @@ export default function CartDialog() {
   }
 
   async function placeOrder() {
-    // Open WhatsApp's tab during the click so pop-up blockers allow it; it gets the order once saved.
-    const tab = window.open('', '_blank')
+    // The server saves the order and sends it to the admin's WhatsApp itself; nothing opens here.
     setSaving(true)
     setError(null)
     try {
@@ -140,15 +135,10 @@ export default function CartDialog() {
         payment_method: method,
         payment_ref: method === 'now' ? paymentRef.trim() : '',
       })
-      if (tab) {
-        tab.opener = null
-        tab.location.href = whatsappLink(orderWhatsApp, orderMessage(order, customer))
-      }
-      setPlaced({ order, customer: { ...customer }, whatsappOpened: Boolean(tab) })
+      setPlaced({ order, customer: { ...customer } })
       clear()
       setStep('done')
     } catch (err) {
-      tab?.close()
       if (err instanceof ApiError && err.status === 409) {
         await reload()
         setStep('cart')
@@ -461,7 +451,7 @@ export default function CartDialog() {
                   Thank you{placed.customer.name ? `, ${placed.customer.name.trim().split(/\s+/)[0]}` : ''}!
                 </p>
                 <p className={styles.muted}>
-                  Order <strong>{placed.order.reference}</strong> is saved. We will confirm it on WhatsApp.
+                  Order <strong>{placed.order.reference}</strong> has reached Klenz. We will confirm it on WhatsApp shortly.
                 </p>
               </div>
               <dl className={styles.receipt}>
@@ -484,24 +474,10 @@ export default function CartDialog() {
               </dl>
             </div>
             <footer className={styles.foot}>
-              <span className={styles.note}>
-                {placed.whatsappOpened
-                  ? 'WhatsApp opened with your order: tap Send there. It did not open? Use the green button.'
-                  : 'Send the order on WhatsApp too, so you have it in your chat with us.'}
-              </span>
               <div className={styles.actions}>
-                <button type="button" className={`${ui.button} ${ui.ghost}`} onClick={close}>
+                <button type="button" className={`${ui.button} ${ui.primary}`} onClick={close}>
                   Done
                 </button>
-                <a
-                  className={styles.whatsapp}
-                  href={whatsappLink(orderWhatsApp, orderMessage(placed.order, placed.customer))}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <WhatsAppIcon size={22} />
-                  Send on WhatsApp
-                </a>
               </div>
             </footer>
           </>

@@ -2,6 +2,10 @@
 
 What was built and decided, in order, so the next round of changes can start from here. How-to guides: [README.md](README.md) (run it on your PC), [DEPLOY.md](DEPLOY.md) (hosting and updates), [CLAUDE.md](CLAUDE.md) (code map for developers and Claude Code).
 
+## 13 October 2026 (night): orders reach WhatsApp without opening anything
+
+- Placing an order no longer opens a WhatsApp tab or WhatsApp Web for the customer; the confirmation screen only has **Done**. The server sends every order to the admin's WhatsApp (+91 95663 78152) by itself through the CallMeBot alert, which must be switched on once in Admin → Settings (one-tap activation link there). The admin dashboard warns while it is off.
+
 ## 13 October 2026 (evening): orders to WhatsApp, starting prices, branding pictures
 
 - **Orders go to WhatsApp +91 95663 78152 by default.** Placing an order now opens WhatsApp by itself with the order addressed to that number (new setting "WhatsApp number that receives orders"; the number shown on the website stays the visiting card's). The automatic CallMeBot alert goes to the same number once its key is saved.

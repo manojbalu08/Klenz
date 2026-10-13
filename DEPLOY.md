@@ -19,7 +19,7 @@ Every push to `main` runs the checks in GitHub Actions: backend tests (on SQLite
 | Database | Aiven project `klenz`: MySQL 8.4, plan Free-1-1gb, DigitalOcean Bangalore |
 | Admin | `/admin`, login `admin@klenz.com`; first password set in Render (`ADMIN_PASSWORD`), change it in **Admin → Settings** |
 | Automatic deploys | Need the GitHub secret `RENDER_DEPLOY_HOOK_URL` and variable `SITE_URL` (step 3 below) |
-| Prices, UPI, WhatsApp alerts | Set in the live admin (step 4 below). Products start with starting prices; checkout shows a sample QR until a UPI ID is saved; orders open WhatsApp to +91 95663 78152 |
+| Prices, UPI, WhatsApp alerts | Set in the live admin (step 4 below). Products start with starting prices; checkout shows a sample QR until a UPI ID is saved; every order is sent to +91 95663 78152 automatically once the alerts are switched on |
 
 Passwords and the database link are kept only in Render and Aiven, never in this repository. Project history and open items: [CHANGELOG.md](CHANGELOG.md).
 
@@ -53,7 +53,7 @@ Do step 2 right away: Aiven may switch off a new free database that nothing conn
 
 ### 4. Prices, payments and order alerts (in the live admin, no code)
 1. **Admin → Products:** every product starts with a starting price (₹35–₹220 per pack). Replace them with the client's real prices: type the price in the list and press Enter. Empty shows "Price on request" (customers can then only choose Pay later).
-   **Admin → Settings → WhatsApp number that receives orders** (default **+91 95663 78152**): when a customer places an order, WhatsApp opens with the order addressed to this number. The WhatsApp number shown on the website (footer, Contact page) is a separate setting.
+   **Admin → Settings → WhatsApp number that receives orders** (default **+91 95663 78152**): every new order is sent to this WhatsApp automatically by the server, once the order alerts are switched on (point 3). The customer's browser opens nothing. The WhatsApp number shown on the website (footer, Contact page) is a separate setting.
 2. **Admin → Settings → Payments (UPI QR):** enter the UPI ID that should receive payments (from GPay, PhonePe or the bank app, e.g. `9087312905@okicici`; a bank account works as `ACCOUNTNUMBER@IFSC.ifsc.npci`) and the name shown in UPI apps. Save, then scan the test QR with a phone: the UPI app should show that name. Until a UPI ID is saved, checkout shows a clearly marked **sample** QR that pays nothing.
 3. **Admin → Settings → Order alerts on WhatsApp** (free, CallMeBot), so orders also arrive without the customer pressing Send. On the phone that should get the alerts (by default the orders number, +91 95663 78152):
    - Open Admin → Settings on that phone and tap **Open it in WhatsApp**, then press Send. (Or send **+34 644 31 95 65** the message `I allow callmebot to send me messages` yourself; check the current number on [callmebot.com](https://www.callmebot.com/blog/free-api-whatsapp-messages/).)
@@ -62,7 +62,7 @@ Do step 2 right away: Aiven may switch off a new free database that nothing conn
    From then on every new order (items, total, payment, customer) arrives on that phone by itself. CallMeBot can only message the phone that activated it.
 
 ### 5. Share the link
-Send the client the Render address and tell them the first visit after a quiet period takes about a minute. At the end of checkout the customer can also send the order on WhatsApp, to the number in **Admin → Settings** (the client's +91 90873 12905), so the client receives the test orders they place. Put your own number there while you test yourself.
+Send the client the Render address and tell them the first visit after a quiet period takes about a minute. Every order is sent automatically to the WhatsApp number that receives orders (Admin → Settings), as long as the order alerts are on; the admin dashboard shows a warning while they are off.
 
 ## Updating the site after feedback
 

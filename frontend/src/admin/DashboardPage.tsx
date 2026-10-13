@@ -17,6 +17,7 @@ const HEADLINE_PAGES = [
 export default function DashboardPage() {
   const dashboard = useLoad(api.dashboard)
   const products = useLoad(api.products)
+  const alerts = useLoad(api.orderAlerts)
   const [editing, setEditing] = useState<AdminProduct | 'new' | null>(null)
 
   const stats = dashboard.data?.stats
@@ -33,10 +34,22 @@ export default function DashboardPage() {
       <PageHeader title="Dashboard" subtitle="Manage your products, enquiries and website content." />
       <ErrorNotice>{dashboard.error ?? products.error}</ErrorNotice>
 
+      {alerts.data && !alerts.data.apikey_set && (
+        <div className={styles.alertsOff} role="status">
+          <span>
+            <strong>WhatsApp order alerts are off.</strong> New orders are saved under Enquiries, but nothing is sent
+            to WhatsApp until you switch alerts on (about 2 minutes, once).
+          </span>
+          <Link to="/admin/settings" className={`${ui.button} ${ui.primary}`}>
+            Switch on alerts
+          </Link>
+        </div>
+      )}
+
       <div className={styles.stats}>
         <Stat label="Products listed" value={stats?.products_listed} />
         <Stat label="New enquiries" value={stats?.new_enquiries} />
-        <Stat label="Quotes sent" value={stats?.quotes_sent} />
+        <Stat label="Confirmed" value={stats?.quotes_sent} />
         <Stat label="Pages published" value={stats?.pages_published} highlight />
       </div>
 

@@ -32,7 +32,7 @@ const TEXT_FIELDS: { key: keyof SiteSettings; label: string; help?: string; type
   {
     key: 'order_whatsapp',
     label: 'WhatsApp number that receives orders',
-    help: 'WhatsApp opens with each placed order addressed to this number. Order alerts go here too.',
+    help: 'Every new order is sent to this WhatsApp automatically, once Order alerts (below) are switched on.',
     type: 'tel',
   },
   { key: 'whatsapp_number', label: 'WhatsApp number on the website', help: 'Shown in the footer and on the Contact page.', type: 'tel' },
