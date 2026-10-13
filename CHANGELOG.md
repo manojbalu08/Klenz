@@ -4,7 +4,7 @@ What was built and decided, in order, so the next round of changes can start fro
 
 ## 13 October 2026 (night): orders reach WhatsApp without opening anything
 
-- Placing an order no longer opens a WhatsApp tab or WhatsApp Web for the customer; the confirmation screen only has **Done**. The server sends every order to the admin's WhatsApp (+91 95663 78152) by itself through the CallMeBot alert, which must be switched on once in Admin → Settings (one-tap activation link there). The admin dashboard warns while it is off.
+- Placing an order no longer opens a WhatsApp tab or WhatsApp Web for the customer. The popup only says **Order placed successfully** with the order number, and has a **Done** button. The customer never sends a WhatsApp message. The server sends every order to the admin's WhatsApp (+91 95663 78152) by itself through the CallMeBot alert, which must be switched on once in Admin → Settings (one-tap activation link there). The admin dashboard warns while it is off.
 
 ## 13 October 2026 (evening): orders to WhatsApp, starting prices, branding pictures
 

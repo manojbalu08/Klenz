@@ -23,7 +23,7 @@ const STEPS = [
   { id: 'details', label: 'Details' },
   { id: 'payment', label: 'Payment' },
 ] as const
-const TITLES: Record<Step, string> = { cart: 'Your cart', details: 'Your details', payment: 'Payment', done: 'Order placed' }
+const TITLES: Record<Step, string> = { cart: 'Your cart', details: 'Your details', payment: 'Payment', done: 'Thank you!' }
 const API_FIELDS: Record<string, FormField> = {
   customer_name: 'name',
   phone: 'phone',
@@ -82,6 +82,8 @@ export default function CartDialog() {
   const method: PaymentMethod = canPayNow ? (chosenMethod ?? 'now') : 'later'
   const qrReady = upiReady(settings)
   const upiNote = `Klenz order ${customer.name}`.trim()
+  const firstName = placed?.customer.name.trim().split(/\s+/)[0]
+  const title = current === 'done' && firstName ? `Thank you, ${firstName}!` : TITLES[current]
 
   // Screen readers hear the new step's title; keyboard users continue from the top.
   useEffect(() => {
@@ -171,7 +173,7 @@ export default function CartDialog() {
         <header className={styles.head}>
           <div className={styles.headText}>
             <h2 ref={titleRef} tabIndex={-1} className={`${ui.display} ${styles.title}`}>
-              {TITLES[current]}
+              {title}
             </h2>
             {current !== 'done' && items.length > 0 && <Steps current={current} />}
           </div>
@@ -447,11 +449,10 @@ export default function CartDialog() {
                 <span className={styles.doneIcon}>
                   <CheckIcon size={34} />
                 </span>
-                <p className={`${ui.display} ${styles.doneTitle}`}>
-                  Thank you{placed.customer.name ? `, ${placed.customer.name.trim().split(/\s+/)[0]}` : ''}!
-                </p>
+                <p className={`${ui.display} ${styles.doneTitle}`}>Order placed successfully</p>
                 <p className={styles.muted}>
-                  Order <strong>{placed.order.reference}</strong> has reached Klenz. We will confirm it on WhatsApp shortly.
+                  Order <strong>{placed.order.reference}</strong> has been sent to Klenz. We will confirm it on WhatsApp
+                  shortly.
                 </p>
               </div>
               <dl className={styles.receipt}>
