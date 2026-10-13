@@ -56,8 +56,7 @@ Do step 2 right away: Aiven may switch off a new free database that nothing conn
    **Admin → Settings → WhatsApp number that receives orders** (default **+91 95663 78152**): when a customer places an order, WhatsApp opens with the order addressed to this number. The WhatsApp number shown on the website (footer, Contact page) is a separate setting.
 2. **Admin → Settings → Payments (UPI QR):** enter the UPI ID that should receive payments (from GPay, PhonePe or the bank app, e.g. `9087312905@okicici`; a bank account works as `ACCOUNTNUMBER@IFSC.ifsc.npci`) and the name shown in UPI apps. Save, then scan the test QR with a phone: the UPI app should show that name. Until a UPI ID is saved, checkout shows a clearly marked **sample** QR that pays nothing.
 3. **Admin → Settings → Order alerts on WhatsApp** (free, CallMeBot), so orders also arrive without the customer pressing Send. On the phone that should get the alerts (by default the orders number, +91 95663 78152):
-   - Save **+34 644 31 95 65** as a contact (check the current number on [callmebot.com](https://www.callmebot.com/blog/free-api-whatsapp-messages/)).
-   - Send it the WhatsApp message `I allow callmebot to send me messages`.
+   - Open Admin → Settings on that phone and tap **Open it in WhatsApp**, then press Send. (Or send **+34 644 31 95 65** the message `I allow callmebot to send me messages` yourself; check the current number on [callmebot.com](https://www.callmebot.com/blog/free-api-whatsapp-messages/).)
    - Paste the API key it replies with, save, and press **Send test message**.
 
    From then on every new order (items, total, payment, customer) arrives on that phone by itself. CallMeBot can only message the phone that activated it.

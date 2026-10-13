@@ -152,6 +152,9 @@ function SettingsForm({ initial, onSaved }: { initial: SiteSettings; onSaved: (s
   )
 }
 
+/** Opens WhatsApp with CallMeBot's activation message filled in. */
+const CALLMEBOT_ACTIVATION = `https://wa.me/34644319565?text=${encodeURIComponent('I allow callmebot to send me messages')}`
+
 interface OrderAlertsFormProps {
   initial: OrderAlerts
   /** Shown when no alert phone is saved: the WhatsApp number for orders is used. */
@@ -216,16 +219,22 @@ function OrderAlertsForm({ initial, fallbackPhone, onSaved }: OrderAlertsFormPro
       </p>
       <ol className={styles.steps}>
         <li>
-          Save <strong>+34 644 31 95 65</strong> as a contact (check the current number on{' '}
+          On the phone that should get the alerts, send CallMeBot (<strong>+34 644 31 95 65</strong>) the WhatsApp
+          message <strong>I allow callmebot to send me messages</strong>.{' '}
+          <a href={CALLMEBOT_ACTIVATION} target="_blank" rel="noreferrer">
+            Open it in WhatsApp
+          </a>{' '}
+          (open this page on that phone and tap the link, then press Send).
+        </li>
+        <li>CallMeBot replies within 2 minutes with an API key. Paste it below and save.</li>
+        <li>
+          Press <strong>Send test message</strong>. From then on every new order arrives on that phone by itself. If
+          the number above stops working, check{' '}
           <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" rel="noreferrer">
             callmebot.com
-          </a>
-          ).
+          </a>{' '}
+          for the current one.
         </li>
-        <li>
-          Send it this WhatsApp message: <strong>I allow callmebot to send me messages</strong>
-        </li>
-        <li>Paste the API key it replies with below, save, then send a test message.</li>
       </ol>
       <div className={ui.formRow}>
         <label className={ui.field}>
