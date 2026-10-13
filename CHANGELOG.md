@@ -2,6 +2,12 @@
 
 What was built and decided, in order, so the next round of changes can start from here. How-to guides: [README.md](README.md) (run it on your PC), [DEPLOY.md](DEPLOY.md) (hosting and updates), [CLAUDE.md](CLAUDE.md) (code map for developers and Claude Code).
 
+## 13 October 2026 (late night): "Falling tissues" background
+
+- Seven animated backgrounds were previewed on the real pages: soft bubbles, aurora, falling tissues, ocean waves, sparkle, floating shapes and colour flow. The choice was **Falling tissues**: soft white tissue sheets float down and flutter over the drifting brand-colour glows, in every section of every page, the admin sign-in included.
+- Taller sections, such as the product grid, fall more slowly, so the tissues drift at the same gentle pace everywhere. Phones show fewer sheets. The animation pauses off screen. Visitors who ask for less motion see only the still glows.
+- The preview bar and the six other styles were removed again, to keep the site light.
+
 ## 13 October 2026 (late night): animated theme background on every page
 
 - Every section of Home, About Us, Contact Us, the "page not found" page and the admin sign-in page now has the same animated brand background: soft glows that drift, bubbles that rise, a fine dot texture, and flowing lines along the bottom like the lines printed on the Klenz packs. It comes in three tones: light sections, the soft blue page tops and the navy bands.

@@ -1,4 +1,5 @@
-/* Animated brand background (ThemeBackdrop.tsx). Behind the content of a `ui.themed` section. */
+/* Animated brand background (ThemeBackdrop.tsx): soft tissue sheets that float down over drifting
+   glows. Behind the content of a `ui.themed` section. */
 .backdrop {
   position: absolute;
   inset: 0;
@@ -115,141 +116,57 @@
   opacity: 0.3;
 }
 
-/* ── Fine dot texture, strongest in one corner ────────── */
+/* ── Falling tissues: soft sheets that float down and flutter ── */
 
-.dots {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle, var(--primary) 1.1px, transparent 1.5px) 0 0 / 24px 24px;
-  opacity: 0.1;
-  -webkit-mask-image: radial-gradient(ellipse at 12% 22%, #000, transparent 55%);
-  mask-image: radial-gradient(ellipse at 12% 22%, #000, transparent 55%);
-}
-
-.backdrop[data-layout='2'] .dots {
-  -webkit-mask-image: radial-gradient(ellipse at 88% 30%, #000, transparent 55%);
-  mask-image: radial-gradient(ellipse at 88% 30%, #000, transparent 55%);
-}
-
-.backdrop[data-layout='3'] .dots {
-  -webkit-mask-image: radial-gradient(ellipse at 50% 90%, #000, transparent 55%);
-  mask-image: radial-gradient(ellipse at 50% 90%, #000, transparent 55%);
-}
-
-.backdrop[data-tone='hero'] .dots {
-  background-image: radial-gradient(circle, #fff 1.3px, transparent 1.7px);
-  opacity: 0.7;
-}
-
-.backdrop[data-tone='dark'] .dots {
-  background-image: radial-gradient(circle, #fff 1px, transparent 1.4px);
-  opacity: 0.12;
-}
-
-/* ── Flowing lines, like the ones printed on the packs, along the bottom ── */
-
-.waves {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 2%;
-  height: 90px;
-}
-
-/* Mirrored, so the lines flow the other way. */
-.backdrop[data-layout='2'] .waves {
-  bottom: 4%;
-  transform: scaleX(-1);
-}
-
-.backdrop[data-layout='3'] .waves {
-  height: 70px;
-  opacity: 0.8;
-}
-
-.wave {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 200%;
-  height: 100%;
-  fill: none;
-  stroke: var(--primary);
-  opacity: 0.18;
-  will-change: transform;
-  animation: flow 30s linear infinite;
-}
-
-.wave path {
-  stroke-width: 1.5;
-  vector-effect: non-scaling-stroke;
-}
-
-.waveSlow {
-  opacity: 0.3;
-  animation-duration: 48s;
-}
-
-.wave .dotted {
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-dasharray: 0.1 8;
-}
-
-.backdrop[data-tone='hero'] .wave {
-  stroke: #fff;
-  opacity: 0.85;
-}
-
-.backdrop[data-tone='dark'] .wave {
-  stroke: var(--accent);
-  opacity: 0.28;
-}
-
-/* ── Bubbles rising through the section ───────────────── */
-
-.bubbles {
+.tissues {
   position: absolute;
   inset: 0;
 }
 
-/* Each bubble rides a lane as tall as the section, so it crosses any section height. */
+/* Mirrored, so a section's tissues don't line up with the one above. */
+.backdrop[data-layout='2'] .tissues {
+  scale: -1 1;
+}
+
+.backdrop[data-layout='3'] .tissues {
+  translate: 3% 0;
+}
+
+/* Each sheet rides a lane as tall as the section, so it crosses any section height. */
 .lane {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 0;
   will-change: transform, opacity;
-  animation: rise 18s linear infinite;
+  animation: fall 20s linear infinite;
 }
 
-.bubble {
+.tissue {
   display: block;
-  border: 1.5px solid var(--primary);
-  border-radius: 50%;
-  background: radial-gradient(circle at 32% 30%, #fff 0 20%, transparent 28%);
+  border-radius: 5px 9px 6px 11px;
+  background: linear-gradient(135deg, #fff 0 40%, var(--soft) 44% 54%, #fff 58%);
+  box-shadow:
+    0 0 0 1px var(--soft),
+    0 8px 18px rgba(10, 31, 68, 0.12);
+  animation: flutter 7s ease-in-out infinite alternate;
+}
+
+.lane:nth-child(odd) .tissue {
+  animation-duration: 9s;
+  animation-direction: alternate-reverse;
+}
+
+.backdrop[data-tone='hero'] .tissue {
+  box-shadow: 0 8px 18px rgba(10, 31, 68, 0.12);
+}
+
+.backdrop[data-tone='dark'] .tissue {
+  box-shadow: none;
   opacity: 0.3;
-  animation: sway 5s ease-in-out infinite alternate;
 }
 
-.lane:nth-child(odd) .bubble {
-  animation-duration: 7s;
-}
-
-.backdrop[data-tone='hero'] .bubble {
-  border-color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.55);
-  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.22);
-  opacity: 0.9;
-}
-
-.backdrop[data-tone='dark'] .bubble {
-  border-color: #fff;
-  background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.8) 0 20%, transparent 28%);
-  opacity: 0.25;
-}
-
-/* Fewer bubbles on phones. */
+/* Fewer sheets and smaller glows on phones. */
 @media (max-width: 560px) {
   .lane:nth-child(even) {
     display: none;
@@ -260,9 +177,9 @@
   }
 }
 
-/* Less motion: keep the still glows, dots and lines; no bubbles. */
+/* Less motion: keep the still glows, no falling sheets. */
 @media (prefers-reduced-motion: reduce) {
-  .bubbles {
+  .tissues {
     display: none;
   }
 }
@@ -279,35 +196,33 @@
   }
 }
 
-@keyframes flow {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes rise {
+@keyframes fall {
   0% {
-    transform: translateY(100%);
+    transform: translateY(-14%);
     opacity: 0;
   }
 
-  12%,
-  80% {
+  10%,
+  85% {
     opacity: 1;
   }
 
   100% {
-    transform: translateY(-4%);
+    transform: translateY(100%);
     opacity: 0;
   }
 }
 
-@keyframes sway {
-  from {
-    transform: translateX(-9px);
+@keyframes flutter {
+  0% {
+    transform: perspective(400px) translateX(-26px) rotate(-28deg) rotateX(20deg);
   }
 
-  to {
-    transform: translateX(9px);
+  50% {
+    transform: perspective(400px) translateX(8px) rotate(10deg) rotateY(55deg);
+  }
+
+  100% {
+    transform: perspective(400px) translateX(30px) rotate(42deg) rotateX(65deg);
   }
 }
