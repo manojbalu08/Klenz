@@ -11,7 +11,7 @@ def test_site_returns_seeded_design_content(client: TestClient) -> None:
     assert len(site["products"]) == 10
     first = site["products"][0]
     assert (first["spec"], first["image_url"]) == ("80 grams", "/images/products/ultra-soft-tissue.jpg")
-    assert first["price"] == 0  # "Price on request" until the admin sets it
+    assert first["price"] == 60  # starting price; the admin changes it
     assert [v["url"] for v in site["videos"]] == [
         "/videos/facial-tissue.mp4",
         "/videos/tissue-napkins.mp4",
@@ -85,9 +85,9 @@ def test_pay_now_records_the_upi_reference(client: TestClient, admin: dict[str, 
 
 
 def test_unpriced_items_leave_the_total_pending(client: TestClient, admin: dict[str, str]) -> None:
-    products = set_prices(client, admin, {"Toilet Roll": 40})
+    products = set_prices(client, admin, {"Toilet Roll": 40, "Kitchen Roll": 0})  # 0 = price on request
     items = [{"product_id": products["Toilet Roll"]["id"], "quantity": 5},
-             {"product_id": products["Kitchen Roll"]["id"], "quantity": 2}]  # no price yet
+             {"product_id": products["Kitchen Roll"]["id"], "quantity": 2}]
 
     order = client.post("/api/orders", json={"customer_name": "Priya", "phone": "9876543210", "items": items}).json()
 
@@ -114,7 +114,7 @@ def test_new_orders_alert_the_admin_on_whatsapp(
     created = client.post("/api/orders", json=order | {"payment_method": "now", "payment_ref": "412345678901"}).json()
 
     [(phone, apikey, text)] = sent
-    assert (phone, apikey) == ("+91 90873 12905", "123456")  # falls back to the shop's WhatsApp number
+    assert (phone, apikey) == ("+91 95663 78152", "123456")  # falls back to the WhatsApp number for orders
     assert f"*New order {created['reference']}*" in text
     assert "• 80 × Premium Facial Tissue Box (2 Ply (Premium Quality)): ₹1,00,000" in text
     assert "*Total: ₹1,00,000*" in text

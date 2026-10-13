@@ -57,6 +57,8 @@ function useTouchScreen(): boolean {
 interface Placed {
   order: OrderCreated
   customer: CustomerDetails
+  /** WhatsApp opened by itself with the order (false if the browser blocked the new tab). */
+  whatsappOpened: boolean
 }
 
 /** The cart popup and the whole checkout: cart → details → payment (UPI QR or later) → placed. */
@@ -82,6 +84,8 @@ export default function CartDialog() {
   const method: PaymentMethod = canPayNow ? (chosenMethod ?? 'now') : 'later'
   const qrReady = upiReady(settings)
   const upiNote = `Klenz order ${customer.name}`.trim()
+  // Orders go to the orders number (Admin → Settings), else to the number shown on the site.
+  const orderWhatsApp = whatsappNumber(settings.order_whatsapp || settings.whatsapp_number, settings.country_code)
 
   // Screen readers hear the new step's title; keyboard users continue from the top.
   useEffect(() => {
@@ -122,6 +126,8 @@ export default function CartDialog() {
   }
 
   async function placeOrder() {
+    // Open WhatsApp's tab during the click so pop-up blockers allow it; it gets the order once saved.
+    const tab = window.open('', '_blank')
     setSaving(true)
     setError(null)
     try {
@@ -134,10 +140,15 @@ export default function CartDialog() {
         payment_method: method,
         payment_ref: method === 'now' ? paymentRef.trim() : '',
       })
-      setPlaced({ order, customer: { ...customer } })
+      if (tab) {
+        tab.opener = null
+        tab.location.href = whatsappLink(orderWhatsApp, orderMessage(order, customer))
+      }
+      setPlaced({ order, customer: { ...customer }, whatsappOpened: Boolean(tab) })
       clear()
       setStep('done')
     } catch (err) {
+      tab?.close()
       if (err instanceof ApiError && err.status === 409) {
         await reload()
         setStep('cart')
@@ -473,17 +484,18 @@ export default function CartDialog() {
               </dl>
             </div>
             <footer className={styles.foot}>
-              <span className={styles.note}>Send the order on WhatsApp too, so you have it in your chat with us.</span>
+              <span className={styles.note}>
+                {placed.whatsappOpened
+                  ? 'WhatsApp opened with your order: tap Send there. It did not open? Use the green button.'
+                  : 'Send the order on WhatsApp too, so you have it in your chat with us.'}
+              </span>
               <div className={styles.actions}>
                 <button type="button" className={`${ui.button} ${ui.ghost}`} onClick={close}>
                   Done
                 </button>
                 <a
                   className={styles.whatsapp}
-                  href={whatsappLink(
-                    whatsappNumber(settings.whatsapp_number, settings.country_code),
-                    orderMessage(placed.order, placed.customer),
-                  )}
+                  href={whatsappLink(orderWhatsApp, orderMessage(placed.order, placed.customer))}
                   target="_blank"
                   rel="noreferrer"
                 >

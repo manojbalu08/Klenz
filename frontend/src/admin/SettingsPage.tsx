@@ -19,7 +19,7 @@ export default function SettingsPage() {
       {alerts.data && (
         <OrderAlertsForm
           initial={alerts.data}
-          fallbackPhone={settings.data?.whatsapp_number ?? ''}
+          fallbackPhone={settings.data?.order_whatsapp || settings.data?.whatsapp_number || ''}
           onSaved={alerts.setData}
         />
       )}
@@ -29,7 +29,13 @@ export default function SettingsPage() {
 }
 
 const TEXT_FIELDS: { key: keyof SiteSettings; label: string; help?: string; type?: string; wide?: boolean }[] = [
-  { key: 'whatsapp_number', label: 'WhatsApp number for orders', help: 'Customers send their order to this number from the cart.', type: 'tel' },
+  {
+    key: 'order_whatsapp',
+    label: 'WhatsApp number that receives orders',
+    help: 'WhatsApp opens with each placed order addressed to this number. Order alerts go here too.',
+    type: 'tel',
+  },
+  { key: 'whatsapp_number', label: 'WhatsApp number on the website', help: 'Shown in the footer and on the Contact page.', type: 'tel' },
   { key: 'country_code', label: 'Country code', help: 'Added to 10-digit numbers for WhatsApp links (91 for India).' },
   { key: 'phone', label: 'Phone numbers', help: 'Shown in the footer and on the Contact page.', wide: true },
   { key: 'email', label: 'Email', type: 'email' },
@@ -235,7 +241,9 @@ function OrderAlertsForm({ initial, fallbackPhone, onSaved }: OrderAlertsFormPro
           {errors.phone ? (
             <span className={ui.fieldError}>{errors.phone}</span>
           ) : (
-            <span className={ui.help}>The phone that activated CallMeBot. Empty uses the WhatsApp number for orders.</span>
+            <span className={ui.help}>
+              The phone that activated CallMeBot. Empty uses the WhatsApp number that receives orders.
+            </span>
           )}
         </label>
         <label className={ui.field}>

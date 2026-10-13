@@ -290,6 +290,9 @@ function Branding({ eyebrow, title, text, points }: BrandingProps) {
       <div className={`${ui.container} ${styles.brandingInner}`}>
         <Reveal className={styles.brandingMedia}>
           <span className={`${ui.circle} ${styles.brandingGlow}`} aria-hidden="true" />
+          <span className={styles.brandingChip} aria-hidden="true">
+            <span>✦</span> Your logo, your colours
+          </span>
           <img
             className={styles.brandingBox}
             src="/images/catalogue/branding-box.jpg"

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { api } from '../lib/api'
-import { rupees } from '../lib/format'
-import type { AdminProduct } from '../lib/types'
+import type { AdminProduct, ProductInput } from '../lib/types'
 import ui from './admin.module.css'
 import ProductForm from './ProductForm'
 import styles from './ProductsPage.module.css'
@@ -45,7 +44,10 @@ export default function ProductsPage() {
             </button>
           </div>
         </div>
-        <p className={ui.muted}>Products show on the website in this order. Drafts are hidden from shoppers.</p>
+        <p className={ui.muted}>
+          Products show on the website in this order. Drafts are hidden from shoppers. Change a price right in the
+          list: type it and press Enter. An empty price shows “Price on request”.
+        </p>
 
         <div className={ui.tableWrap}>
           <table className={`${ui.table} ${styles.table}`}>
@@ -98,7 +100,18 @@ export default function ProductsPage() {
                   </td>
                   <td className={ui.muted}>{product.category}</td>
                   <td className={ui.nowrap}>{product.spec || '—'}</td>
-                  <td className={ui.nowrap}>{product.price > 0 ? rupees(product.price) : <span className={ui.muted}>On request</span>}</td>
+                  <td className={ui.nowrap}>
+                    {/* Keyed by price so it shows the new value after a save in the edit dialog. */}
+                    <PriceCell
+                      key={`${product.id}-${product.price}`}
+                      product={product}
+                      onSaved={(saved) => {
+                        products.setData(list.map((p) => (p.id === saved.id ? saved : p)))
+                        flash(`Saved the price of “${saved.name}”.`)
+                      }}
+                      onError={setError}
+                    />
+                  </td>
                   <td>
                     <LivePill live={product.is_live} />
                   </td>
@@ -125,5 +138,68 @@ export default function ProductsPage() {
         />
       )}
     </>
+  )
+}
+
+interface PriceCellProps {
+  product: AdminProduct
+  onSaved: (product: AdminProduct) => void
+  onError: (message: string) => void
+}
+
+/** The price per pack, editable in the list: Enter or clicking away saves it. */
+function PriceCell({ product, onSaved, onError }: PriceCellProps) {
+  const initial = product.price > 0 ? String(product.price) : ''
+  const [text, setText] = useState(initial)
+  const [busy, setBusy] = useState(false)
+
+  async function save() {
+    const price = text.trim() === '' ? 0 : Number(text.trim())
+    if (Number.isNaN(price) || price < 0) {
+      onError(`Enter a price like 120 or 120.50 for “${product.name}”, or leave it empty.`)
+      setText(initial)
+      return
+    }
+    if (price === product.price) return
+    const input: ProductInput = {
+      name: product.name,
+      category: product.category,
+      description: product.description,
+      spec: product.spec,
+      price,
+      art: product.art,
+      tint: product.tint,
+      image_url: product.image_url,
+      is_live: product.is_live,
+    }
+    setBusy(true)
+    try {
+      onSaved(await api.updateProduct(product.id, input))
+    } catch (err) {
+      onError(err instanceof Error ? err.message : 'Could not save the price.')
+      setText(initial)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <label className={styles.price}>
+      <span aria-hidden="true">₹</span>
+      <input
+        inputMode="decimal"
+        value={text}
+        placeholder="On request"
+        maxLength={10}
+        disabled={busy}
+        aria-label={`Price per pack of ${product.name}`}
+        onChange={(e) => setText(e.target.value)}
+        onBlur={() => void save()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') e.currentTarget.blur()
+          if (e.key === 'Escape') setText(initial)
+        }}
+      />
+    </label>
   )
 }

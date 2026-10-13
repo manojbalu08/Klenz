@@ -129,7 +129,10 @@ class ReorderIn(BaseModel):
 
 
 class SiteSettingsOut(BaseModel):
+    # Shown on the website (footer, Contact page).
     whatsapp_number: str
+    # Receives placed orders: the customer's WhatsApp message and the automatic alert.
+    order_whatsapp: str
     phone: str
     email: str
     address: str
@@ -142,6 +145,7 @@ class SiteSettingsOut(BaseModel):
 
 class SiteSettingsIn(BaseModel):
     whatsapp_number: Annotated[str, _trimmed(30), AfterValidator(_optional_phone)] = ""
+    order_whatsapp: Annotated[str, _trimmed(30), AfterValidator(_optional_phone)] = ""
     phone: Annotated[str, _trimmed(60)] = ""
     email: Annotated[str, _trimmed(191), AfterValidator(_optional_email)] = ""
     address: Annotated[str, _trimmed(300)] = ""

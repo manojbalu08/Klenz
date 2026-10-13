@@ -2,6 +2,12 @@
 
 What was built and decided, in order, so the next round of changes can start from here. How-to guides: [README.md](README.md) (run it on your PC), [DEPLOY.md](DEPLOY.md) (hosting and updates), [CLAUDE.md](CLAUDE.md) (code map for developers and Claude Code).
 
+## 13 October 2026 (evening): orders to WhatsApp, starting prices, branding pictures
+
+- **Orders go to WhatsApp +91 95663 78152 by default.** Placing an order now opens WhatsApp by itself with the order addressed to that number (new setting "WhatsApp number that receives orders"; the number shown on the website stays the visiting card's). The automatic CallMeBot alert goes to the same number once its key is saved.
+- **Every product has a price.** Starting prices were filled in (₹35–₹220 per pack, to be confirmed by the client), also on existing databases, once. The admin changes a price by typing it straight into the products list (Enter saves) or in the edit form.
+- **"Your brand on every pack" pictures** are smaller, framed in white, tilted and overlapping, with a "Your logo, your colours" badge (they had been stretched).
+
 ## 13 October 2026: checkout with UPI payment, prices and design round
 
 Requested after the first review:
@@ -49,7 +55,7 @@ Checks: 36 backend tests (SQLite, MySQL 5.0 on this PC, MySQL 8.4 in GitHub Acti
 
 ## Open items
 - Add the GitHub secret `RENDER_DEPLOY_HOOK_URL` and the variable `SITE_URL` ([DEPLOY.md](DEPLOY.md), step 3) so every push deploys by itself; until then use Render → **Manual Deploy**.
-- In the live admin: the price of each product, the real UPI ID (replaces the sample QR) and the WhatsApp order alerts ([DEPLOY.md](DEPLOY.md), step 4).
-- From the client: prices, UPI ID, PIN code (642001 on the visiting card or 642002 in the catalogue), About Us text, opening hours, their own photos and videos, and the WhatsApp number for orders.
+- In the live admin: the client's real prices (replace the starting prices), the real UPI ID (replaces the sample QR) and the WhatsApp order alerts ([DEPLOY.md](DEPLOY.md), step 4).
+- From the client: real prices, UPI ID, PIN code (642001 on the visiting card or 642002 in the catalogue), About Us text, opening hours, their own photos and videos, and the WhatsApp number for orders.
 - Before announcing the site: change the admin password if it was shared, and delete the sample and test enquiries.
 - Optional: the client's own domain. `klenztissue.com` and `klenztissue.in` were free on 13 October; `klenz.com`, `klenz.in` and `pollachi.com` are taken.

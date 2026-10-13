@@ -2,6 +2,9 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import delete, update
+
+from app.models import Product, SiteSetting
 
 from .conftest import IN_MEMORY, TEST_DATABASE_URL, ClientFactory, login
 
@@ -84,8 +87,8 @@ def test_deleting_a_product_keeps_past_orders(client: TestClient, admin: dict[st
         "product_name": "HRT Roll",
         "product_spec": "1 kg, 40 GSM",
         "quantity": 20,
-        "unit_price": 0.0,
-        "line_total": 0.0,
+        "unit_price": 220.0,
+        "line_total": 4400.0,
     }
 
 
@@ -138,6 +141,7 @@ def test_content_editing(client: TestClient, admin: dict[str, str]) -> None:
 def test_settings(client: TestClient, admin: dict[str, str]) -> None:
     payload = {
         "whatsapp_number": "+91 98765 43210",
+        "order_whatsapp": "+91 95663 78152",
         "phone": "044 2345 6789",
         "email": "hello@klenz.in",
         "address": "Plot 4, SIDCO Estate, Chennai 600098",
@@ -182,6 +186,25 @@ def test_order_alert_settings_keep_the_key_secret(
 
     assert client.put(alerts, headers=admin, json={"phone": "", "apikey": ""}).json()["apikey_set"] is False
     assert client.put(alerts, headers=admin, json={"phone": "call me"}).status_code == 422
+
+
+def test_starting_prices_fill_an_older_database_once(make_client: ClientFactory, tmp_path: Path) -> None:
+    url = f"sqlite:///{(tmp_path / 'klenz.db').as_posix()}" if IN_MEMORY else TEST_DATABASE_URL
+    first = make_client(database_url=url)
+    with first.app.state.session_factory() as session:  # make it look like a database from before prices
+        session.execute(update(Product).values(price=0))
+        session.execute(delete(SiteSetting).where(SiteSetting.key == "_prices_set_at"))
+        session.commit()
+
+    second = make_client(database_url=url, fresh=False)
+    prices = {p["name"]: p["price"] for p in second.get("/api/site").json()["products"]}
+    assert (prices["HRT Roll"], prices["Toilet Roll"]) == (220, 35)
+
+    # Only once: a price the admin sets back to 0 ("on request") stays 0 after the next start.
+    hrt = next(p for p in second.get("/api/admin/products", headers=login(second)).json() if p["name"] == "HRT Roll")
+    second.put(f"/api/admin/products/{hrt['id']}", headers=login(second), json=hrt | {"price": 0})
+    third = make_client(database_url=url, fresh=False)
+    assert {p["name"]: p["price"] for p in third.get("/api/site").json()["products"]}["HRT Roll"] == 0
 
 
 def test_unedited_old_page_text_is_upgraded(make_client: ClientFactory, tmp_path: Path) -> None:

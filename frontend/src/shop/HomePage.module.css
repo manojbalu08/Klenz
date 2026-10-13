@@ -561,42 +561,72 @@
   gap: 56px;
 }
 
+/* Two framed photos, slightly tilted and overlapping, on a soft glow. */
 .brandingMedia {
-  flex: 1 1 420px;
+  flex: 1 1 380px;
   position: relative;
-  min-height: clamp(300px, 62vw, 440px);
+  max-width: 520px;
+  height: clamp(270px, 38vw, 360px);
+  margin: 0 auto;
 }
 
 .brandingGlow {
   left: 50%;
   top: 50%;
-  width: 380px;
-  height: 380px;
-  margin: -190px 0 0 -190px;
-  background: var(--soft);
+  width: 300px;
+  height: 300px;
+  margin: -150px 0 0 -150px;
+  background: radial-gradient(circle, var(--soft2), var(--soft) 70%);
   animation: breathe 8s ease-in-out infinite;
 }
 
 .brandingBox,
 .brandingCover {
   position: absolute;
-  border-radius: 24px;
+  height: auto;
+  aspect-ratio: 900 / 660;
+  object-fit: cover;
+  border: 6px solid #fff;
+  border-radius: 22px;
   background: #fff;
-  box-shadow: 0 24px 50px rgba(10, 31, 68, 0.18);
+  box-shadow: 0 18px 40px rgba(10, 31, 68, 0.18);
 }
 
 .brandingBox {
-  left: 4%;
-  top: 6%;
-  width: 64%;
+  left: 0;
+  top: 4%;
+  width: 62%;
   animation: float-box 7s ease-in-out infinite;
 }
 
 .brandingCover {
-  right: 2%;
+  right: 0;
   bottom: 4%;
-  width: 58%;
+  width: 52%;
+  z-index: 1;
   animation: float-cover 8s ease-in-out infinite;
+}
+
+.brandingChip {
+  position: absolute;
+  right: 6%;
+  top: 2%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(10, 31, 68, 0.16);
+  animation: bob 5s ease-in-out infinite;
+}
+
+.brandingChip span {
+  color: var(--primary);
 }
 
 .brandingText {

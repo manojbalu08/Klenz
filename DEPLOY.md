@@ -19,7 +19,7 @@ Every push to `main` runs the checks in GitHub Actions: backend tests (on SQLite
 | Database | Aiven project `klenz`: MySQL 8.4, plan Free-1-1gb, DigitalOcean Bangalore |
 | Admin | `/admin`, login `admin@klenz.com`; first password set in Render (`ADMIN_PASSWORD`), change it in **Admin → Settings** |
 | Automatic deploys | Need the GitHub secret `RENDER_DEPLOY_HOOK_URL` and variable `SITE_URL` (step 3 below) |
-| Prices, UPI, WhatsApp alerts | Set in the live admin (step 4 below). Until then products show "Price on request" and checkout shows a sample QR |
+| Prices, UPI, WhatsApp alerts | Set in the live admin (step 4 below). Products start with starting prices; checkout shows a sample QR until a UPI ID is saved; orders open WhatsApp to +91 95663 78152 |
 
 Passwords and the database link are kept only in Render and Aiven, never in this repository. Project history and open items: [CHANGELOG.md](CHANGELOG.md).
 
@@ -52,9 +52,10 @@ Do step 2 right away: Aiven may switch off a new free database that nothing conn
 3. **Actions → Test and deploy → Run workflow.** When it turns green, the site runs that commit.
 
 ### 4. Prices, payments and order alerts (in the live admin, no code)
-1. **Admin → Products:** set the price per pack of each product. Empty shows "Price on request" (customers can then only choose Pay later).
+1. **Admin → Products:** every product starts with a starting price (₹35–₹220 per pack). Replace them with the client's real prices: type the price in the list and press Enter. Empty shows "Price on request" (customers can then only choose Pay later).
+   **Admin → Settings → WhatsApp number that receives orders** (default **+91 95663 78152**): when a customer places an order, WhatsApp opens with the order addressed to this number. The WhatsApp number shown on the website (footer, Contact page) is a separate setting.
 2. **Admin → Settings → Payments (UPI QR):** enter the UPI ID that should receive payments (from GPay, PhonePe or the bank app, e.g. `9087312905@okicici`; a bank account works as `ACCOUNTNUMBER@IFSC.ifsc.npci`) and the name shown in UPI apps. Save, then scan the test QR with a phone: the UPI app should show that name. Until a UPI ID is saved, checkout shows a clearly marked **sample** QR that pays nothing.
-3. **Admin → Settings → Order alerts on WhatsApp** (free, CallMeBot), on the phone that should get the alerts:
+3. **Admin → Settings → Order alerts on WhatsApp** (free, CallMeBot), so orders also arrive without the customer pressing Send. On the phone that should get the alerts (by default the orders number, +91 95663 78152):
    - Save **+34 644 31 95 65** as a contact (check the current number on [callmebot.com](https://www.callmebot.com/blog/free-api-whatsapp-messages/)).
    - Send it the WhatsApp message `I allow callmebot to send me messages`.
    - Paste the API key it replies with, save, and press **Send test message**.

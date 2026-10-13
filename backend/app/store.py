@@ -11,6 +11,8 @@ from .schemas import OrderAlertsIn, OrderAlertsOut, SiteSettingsIn, SiteSettings
 # An empty upi_id shows a sample payment QR until the real UPI ID is entered.
 SETTING_DEFAULTS: dict[str, str] = {
     "whatsapp_number": "+91 90873 12905",
+    # Where placed orders go on WhatsApp (the customer's message and the automatic alert).
+    "order_whatsapp": "+91 95663 78152",
     "phone": "+91 90873 12905, +91 73973 83403",
     "email": "klenztissue@gmail.com",
     "address": "Pollachi - 642001",
@@ -42,9 +44,11 @@ def write_settings(db: Session, data: SiteSettingsIn) -> SiteSettingsOut:
 
 
 def read_alert_target(db: Session) -> tuple[str, str]:
-    """(phone, apikey) for order alerts; the phone falls back to the WhatsApp number."""
-    values = _stored(db, [ALERT_PHONE, ALERT_APIKEY, "whatsapp_number"])
-    phone = values.get(ALERT_PHONE) or values.get("whatsapp_number") or SETTING_DEFAULTS["whatsapp_number"]
+    """(phone, apikey) for order alerts; the phone falls back to the WhatsApp number that receives orders."""
+    values = _stored(db, [ALERT_PHONE, ALERT_APIKEY, "order_whatsapp", "whatsapp_number"])
+    settings = SETTING_DEFAULTS | values
+    # Same order as the website: the orders number, else the number shown on the site.
+    phone = values.get(ALERT_PHONE) or settings["order_whatsapp"] or settings["whatsapp_number"]
     return phone, values.get(ALERT_APIKEY, "")
 
 

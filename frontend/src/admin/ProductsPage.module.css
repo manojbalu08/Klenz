@@ -21,3 +21,35 @@
 .thumb[data-tint='soft2'] {
   background: var(--soft2);
 }
+
+/* Price you can type straight into the list. */
+.price {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  min-height: 40px;
+  border-radius: 12px;
+  border: 1.5px solid var(--a-input-border);
+  background: var(--a-cream);
+  font-weight: 700;
+}
+
+.price:focus-within {
+  border-color: var(--a-accent);
+  box-shadow: 0 0 0 3px rgba(29, 95, 224, 0.15);
+}
+
+.price input {
+  width: 84px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: var(--a-ink);
+  outline: none;
+}
+
+.price input::placeholder {
+  font-weight: 500;
+  color: var(--a-muted);
+}

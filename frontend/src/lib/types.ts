@@ -40,7 +40,10 @@ export interface Video {
 export type VideoInput = Omit<Video, 'id'>
 
 export interface SiteSettings {
+  /** Shown on the website (footer, Contact page). */
   whatsapp_number: string
+  /** Receives placed orders: the customer's WhatsApp message and the automatic alert. */
+  order_whatsapp: string
   phone: string
   email: string
   address: string
