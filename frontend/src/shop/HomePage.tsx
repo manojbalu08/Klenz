@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { CheckIcon, IdealIcon } from '../components/icons'
 import { Reveal, useReducedMotion } from '../components/motion'
 import { lines } from '../lib/format'
@@ -209,7 +209,10 @@ interface ProductGridProps {
 
 function ProductGrid({ products, eyebrow, title, note }: ProductGridProps) {
   const categories = useMemo(() => ['All', ...new Set(products.map((p) => p.category))], [products])
-  const [filter, setFilter] = useState('All')
+  // The About page links to one range with ?range=<category>; a chip the visitor picks wins.
+  const [params] = useSearchParams()
+  const [chosen, setFilter] = useState<string | null>(null)
+  const filter = chosen ?? params.get('range') ?? 'All'
   const active = categories.includes(filter) ? filter : 'All'
   const visible = active === 'All' ? products : products.filter((p) => p.category === active)
 

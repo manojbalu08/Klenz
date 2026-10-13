@@ -90,7 +90,7 @@ What a deploy does to the live database:
 3. **No sleeping (optional, paid).** Switch the Render service to a paid instance type, or move to Railway (about US$5 a month, see [Other hosts](#other-hosts)).
 4. Before announcing the site:
    - **Admin → Settings:** change the admin password; check the WhatsApp number, phones, email, address (PIN **642001** on the visiting card, **642002** in the catalogue) and opening hours.
-   - **Admin → Page content:** replace the About Us placeholder text.
+   - **Admin → Page content → About Us:** the founders' or partners' names, roles, photos and a line about each (placeholders until then), and any customer names to show. Check the story text with the client.
    - **Admin → Products:** every product has its real price.
    - **Admin → Settings:** the real UPI ID is saved (no sample QR), and order alerts are on (test message received).
    - **Admin → Enquiries:** delete the "Sample …" and test enquiries.

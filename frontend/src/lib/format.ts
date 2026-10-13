@@ -60,3 +60,13 @@ export function lines(text: string): string[] {
     .map((line) => line.trim())
     .filter(Boolean)
 }
+
+/** Lines written as "title | text" (the text part is optional). */
+export function pairs(text: string): { title: string; text: string }[] {
+  return lines(text)
+    .map((line) => {
+      const [title, ...rest] = line.split('|')
+      return { title: title.trim(), text: rest.join('|').trim() }
+    })
+    .filter((pair) => pair.title)
+}

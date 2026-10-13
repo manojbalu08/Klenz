@@ -210,14 +210,28 @@ def test_starting_prices_fill_an_older_database_once(make_client: ClientFactory,
 def test_unedited_old_page_text_is_upgraded(make_client: ClientFactory, tmp_path: Path) -> None:
     url = f"sqlite:///{(tmp_path / 'klenz.db').as_posix()}" if IN_MEMORY else TEST_DATABASE_URL
     first = make_client(database_url=url)
-    old_texts = {"home.step2_title": "Send on WhatsApp", "home.step3_text": "Our own words"}
+    old_texts = {
+        "home.step2_title": "Send on WhatsApp",
+        "home.step3_text": "Our own words",
+        "about.intro": "[Write a short introduction to Klenz here — who you are and what you make.]",
+    }
     first.put("/api/admin/content", headers=login(first), json={"values": old_texts})
 
     content = make_client(database_url=url, fresh=False).get("/api/site").json()["content"]
 
     assert content["home.step2_title"] == "Place your order"  # old default: replaced
+    assert content["about.intro"].startswith("Klenz makes tissue")  # old placeholder: replaced
     assert content["home.step3_text"] == "Our own words"  # edited by the admin: kept
     assert "site.announcement" not in content
+
+
+def test_default_page_text_has_no_placeholders(client: TestClient) -> None:
+    content = client.get("/api/site").json()["content"]
+    assert not [key for key, value in content.items() if "[" in value]
+    # At most two founders or partners on the About page.
+    assert {key for key in content if key.startswith("about.person")} == {
+        f"about.person{n}_{part}" for n in (1, 2) for part in ("name", "role", "bio", "photo")
+    }
 
 
 def test_videos(client: TestClient, admin: dict[str, str]) -> None:

@@ -2,6 +2,21 @@
 
 What was built and decided, in order, so the next round of changes can start from here. How-to guides: [README.md](README.md) (run it on your PC), [DEPLOY.md](DEPLOY.md) (hosting and updates), [CLAUDE.md](CLAUDE.md) (code map for developers and Claude Code).
 
+## 13 October 2026 (late night): new About Us page
+
+- The About Us page was rebuilt with real content from the visiting card and catalogue, replacing the "[ … ]" placeholders:
+  - a hero photo of the Klenz napkin pack (the client's photo, real logo) with "Made in Pollachi" and "Soft · Clean · Everyday" badges;
+  - a facts strip with the live product and range counts, pan-India delivery and custom branding;
+  - the story;
+  - four values;
+  - a dark "Our range at a glance" band whose cards open the shop on that range;
+  - the founders;
+  - "Who we serve" (eight customer types);
+  - a "Become a Klenz partner" banner with Talk to us / WhatsApp buttons.
+- **Founders / partners:** at most two people, each with name, role, a few lines and a photo, edited in Admin → Page content → About Us. The names are placeholders ("Founder's name", "Co-founder's name") until the client gives the real ones. An empty name hides that person, and without a photo an icon is shown.
+- **Customers and partners:** the eight customer types are shown with icons. Real customer or partner names can be listed in Admin → Page content → About Us → *Customers — names*, one per line. The list stays hidden while it is empty: no names were invented.
+- All of it is editable in the admin. The old unedited About texts on the live site are replaced on the next start; the old catalogue banner photo had the old "KLENZ + leaf" print and is no longer used.
+
 ## 13 October 2026 (late night): CallMeBot's new number
 
 - CallMeBot now uses **+34 644 45 70 57** for activation (it was +34 644 31 95 65). Admin → Settings and DEPLOY.md use the new number and explain that a key only works for the WhatsApp number that asked for it. A test that CallMeBot rejects with "APIKey is invalid" now says so in plain words. The live alerts (number +91 73973 83403) had a key that did not belong to that number, so they need activating again from that phone.
@@ -64,6 +79,6 @@ Checks: 36 backend tests (SQLite, MySQL 5.0 on this PC, MySQL 8.4 in GitHub Acti
 ## Open items
 - Add the GitHub secret `RENDER_DEPLOY_HOOK_URL` and the variable `SITE_URL` ([DEPLOY.md](DEPLOY.md), step 3) so every push deploys by itself; until then use Render → **Manual Deploy**.
 - In the live admin: the client's real prices (replace the starting prices), the real UPI ID (replaces the sample QR) and the WhatsApp order alerts ([DEPLOY.md](DEPLOY.md), step 4).
-- From the client: real prices, UPI ID, PIN code (642001 on the visiting card or 642002 in the catalogue), About Us text, opening hours, their own photos and videos, and the WhatsApp number for orders.
+- From the client: real prices, UPI ID, PIN code (642001 on the visiting card or 642002 in the catalogue), the founders' or partners' names, roles, photos and a line about each (About Us), customer names they want shown, opening hours, their own photos and videos, and the WhatsApp number for orders.
 - Before announcing the site: change the admin password if it was shared, and delete the sample and test enquiries.
 - Optional: the client's own domain. `klenztissue.com` and `klenztissue.in` were free on 13 October; `klenz.com`, `klenz.in` and `pollachi.com` are taken.

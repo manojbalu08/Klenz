@@ -1,8 +1,8 @@
 """Brand images from the client's files in Images/.
 
 Run from klenz-website/:  python tools/make_brand_images.py
-Writes the transparent round logo, the favicons, the hero photo and the two "Your brand on every pack"
-pictures into frontend/public/.
+Writes the transparent round logo, the favicons, the hero photo, the About page photo and the two
+"Your brand on every pack" pictures into frontend/public/.
 """
 from pathlib import Path
 
@@ -41,6 +41,12 @@ save(touch, PUBLIC / "apple-touch-icon.png", optimize=True)
 hero = Image.open(IMAGES / "facial_tissue.jpeg").convert("RGB")
 hero.thumbnail((720, 1080))
 save(hero, PUBLIC / "images" / "brand" / "hero-facial-tissue.jpg", quality=82, optimize=True, progressive=True)
+
+# About page hero: the whole napkin pack on its counter, 4:3 (the client's photo has the real logo).
+about = Image.open(IMAGES / "napkin_tissue.jpeg").convert("RGB").crop((0, 104, 1280, 1064))
+about = about.resize((960, 720), Image.Resampling.LANCZOS)
+about = about.filter(ImageFilter.UnsharpMask(radius=1.2, percent=50, threshold=2))
+save(about, PUBLIC / "images" / "brand" / "about-napkins.jpg", quality=84, optimize=True, progressive=True)
 
 for name, (source, box) in BRANDING.items():
     picture = Image.open(IMAGES / source).convert("RGB").crop(box).resize((900, 660), Image.Resampling.LANCZOS)
