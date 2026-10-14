@@ -23,10 +23,23 @@ Every push to `main` runs the checks in GitHub Actions: backend tests (on SQLite
 
 Passwords and the database link are kept only in Render and Aiven, never in this repository. Project history and open items: [CHANGELOG.md](CHANGELOG.md).
 
-Limits of the free plans:
-- **Render puts the site to sleep after 15 minutes without visitors.** The next visitor waits about a minute while it wakes up. Tell the client.
-- **Aiven may switch off a free database it sees as unused.** It emails first; switch it back on in the Aiven console.
+Limits of the free plans, and what handles them:
+- **Render puts the site to sleep after 15 minutes without visitors**, and waking it takes about a minute.
+- **Aiven may switch off a free database it sees as unused.** It emails first.
+- **The keep-alive** ([.github/workflows/keep-alive.yml](.github/workflows/keep-alive.yml)) handles both. Every 10 minutes GitHub visits `/api/ping`, which wakes the site and runs a query on the database, so neither sleeps. One always-on free service uses about 730 of Render's 750 free hours a month, so don't add a second free Render service.
+  - If a visit fails, GitHub emails the person who last changed that file. See [Site does not open](#site-does-not-open).
+  - GitHub runs scheduled jobs late at busy times, so a rare one-minute wake-up can still happen. For exact timing, also add a free job at [cron-job.org](https://cron-job.org) that opens `https://klenz-tissue.onrender.com/api/ping` every 5 minutes.
+  - GitHub switches scheduled jobs off in a public repository after 60 days without a commit, and emails a warning first. Any push, or **Actions → Keep the site awake → Enable workflow**, turns it back on.
+- **If the database is down anyway**, the site still starts. Visitors see "The shop is waking up" and the page opens by itself when the database is back. The app retries the database every 30 seconds, so no redeploy is needed.
 - **GitHub Pages can't be used.** GitHub does not allow online shops or password logins on Pages, and Pages cannot run the Python API or MySQL.
+
+### Site does not open
+
+1. Open `https://klenz-tissue.onrender.com/api/health`.
+   - **No answer after 2 minutes:** the app itself is not running. Open Render → **klenz-tissue → Logs** and **Events**. Use **Manual Deploy → Deploy latest commit**, or paste the last log lines to a developer.
+   - **`"ready": false`:** the app runs but cannot reach the database. Go to step 2.
+2. Aiven console → project **klenz** → the MySQL service. If it says **Powered off**, use **Actions → Power on service** and wait for **Running**. Restoring can take a few minutes. The site picks it up by itself within 30 seconds.
+3. `https://klenz-tissue.onrender.com/api/ping` should answer `{"status":"ok"}`.
 
 ## One-time setup (about 30 minutes)
 

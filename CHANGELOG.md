@@ -2,6 +2,13 @@
 
 What was built and decided, in order, so the next round of changes can start from here. How-to guides: [README.md](README.md) (run it on your PC), [DEPLOY.md](DEPLOY.md) (hosting and updates), [CLAUDE.md](CLAUDE.md) (code map for developers and Claude Code).
 
+## 14 October 2026: the site no longer gets stuck on Render's loading page
+
+- **What happened:** the live site showed Render's "waking up / application loading" page and never opened. The free Aiven database had most likely been switched off after the quiet night. The app needed the database to start, so it never started.
+- **Keep-alive:** a new GitHub Action ([keep-alive.yml](.github/workflows/keep-alive.yml)) visits `/api/ping` every 10 minutes. Render no longer sleeps and the database stays in use. If a visit fails, GitHub emails the repository owner.
+- **No more stuck starts:** the site now starts even when the database is down. It retries the database every 30 seconds and recovers by itself once the database is back, with no redeploy. Meanwhile visitors see "The shop is waking up" and the page opens by itself.
+- `/api/health` now also says whether the database is `ready`. DEPLOY.md has a short "Site does not open" checklist.
+
 ## 13 October 2026 (late night): "Falling tissues" background
 
 - Seven animated backgrounds were previewed on the real pages: soft bubbles, aurora, falling tissues, ocean waves, sparkle, floating shapes and colour flow. The choice was **Falling tissues**: soft white tissue sheets float down and flutter over the drifting brand-colour glows, in every section of every page, the admin sign-in included.
